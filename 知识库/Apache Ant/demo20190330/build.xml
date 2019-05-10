@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="sample" default="war">
+	<target name="clean">
+		<delete dir="${basedir}/classes"></delete>
+	</target>
+	
+	<path id="master-classpath">
+      <fileset dir="${basedir}/">
+         <include name="**/*.java"/>
+      </fileset>
+   </path>
+	
+	<path id="lib">
+		<fileset dir="${basedir}/WebContent/WEB-INF/lib">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- 编译  -->
+	<target name="compile" description="--> compile and jar this component">
+		<mkdir dir="${basedir}/classes"/>
+		<javac srcdir="${basedir}/" destdir="${basedir}/classes">
+			<classpath refid="lib"/>
+		</javac>
+	</target>
+	
+	<!-- <target name="war" depends="compile"> -->
+	<target name="war">
+		<war destfile="${basedir}/shr.war" webxml="WebContent/WEB-INF/web.xml">
+			<!-- 拷贝WebRoot下除了WEB-INF和META-INF的两个文件夹-->
+			<fileset dir="WebContent" includes="**/*.jsp"/>
+			
+			<!-- 拷贝lib目录下的jar包-->
+			<lib dir="WebContent/WEB-INF/lib"/>
+			<!-- 拷贝build/classes下的class文件-->
+			<classes dir="${basedir}/classes"/>
+		</war>
+	</target>
+
+</project>
