@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--    <bean id="configurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">-->
+<!--        <property name="customEditors">-->
+<!--            <bean class="java.util.HashMap">-->
+<!--                <constructor-arg>-->
+<!--                <map>-->
+<!--                    <entry key="java.util.Date">-->
+<!--                        <ref bean="datePropertyEditor"/>-->
+<!--                    </entry>-->
+<!--                </map>-->
+<!--                </constructor-arg>-->
+<!--            </bean>-->
+<!--        </property>-->
+<!--    </bean>-->
+<!--    <bean id="datePropertyEditor" class="cn.shrmus.editor.DatePropertyEditor">-->
+<!--        <property name="datePattern">-->
+<!--            <value>yyyy-MM-dd</value>-->
+<!--        </property>-->
+<!--    </bean>-->
+    <bean id="entity" class="cn.shrmus.editor.Entity">
+        <property name="date">
+            <value>2019-05-09</value>
+        </property>
+    </bean>
+</beans>
