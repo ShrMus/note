@@ -1,0 +1,39 @@
+DatePropertyEditor没有被注册到容器中
+
+发现在容器中，获取Bean的时候有没有获取DatePropertyEditor的信息
+
+Spring版本问题？
+
+换成Spring 2.5之后能跑成功
+
+Spring4.3跑失败
+
+debug看两个版本的差别
+
+Spring4.3当中拿到的editor的属性值是null，但是我在程序当中设置了
+
+再回过头看两个版本的程序
+
+Spring 2.5 put方法的参数是editor对象
+
+Spring 4.3 put方法的参数是字节码
+
+所以拿到的editor是没有属性值的
+
+Spring 4.3 版本的代码有问题
+
+在网上找到解决方法
+
+------------------------------------
+底下是源码中的小细节
+TypedStringValue
+
+AbstractBeanFactory  customerEditors
+
+PropertyEditorRegistrySupport customerEditors
+
+
+2.5 put对象 postProcessBeanFactory registerCustomEditor
+
+4.3 put字节码 postProcessBeanFactory registerCustomEditor 有错误
+4.3 put对象   postProcessBeanFactory addPropertyEditorRegistrar
