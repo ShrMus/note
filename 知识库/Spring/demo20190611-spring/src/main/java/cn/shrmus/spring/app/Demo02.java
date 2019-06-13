@@ -2,7 +2,6 @@ package cn.shrmus.spring.app;
 
 import cn.shrmus.spring.service.UserService;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,10 +21,10 @@ public class Demo02 {
 //        BeanFactory beanFactory = new XmlBeanFactory(resource);
 //        UserService userService = beanFactory.getBean(UserService.class);
 //        userService.getUserInfo();
-
+//
 //        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
         ApplicationContext applicationContext = new FileSystemXmlApplicationContext("classpath:applicationContext.xml");
         UserService userService = (UserService) applicationContext.getBean("userService");
-        userService.getUserInfo();
+        userService.execute();
     }
 }

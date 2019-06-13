@@ -13,9 +13,9 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public void getUserInfo(){
-        System.out.println("UserService：getUserInfo()");
-        this.userDao.getUserInfo();
+    public void execute(){
+        System.out.println("UserService：execute()");
+        this.userDao.execute();
     }
 
     public void setUserDao(UserDao userDao) {

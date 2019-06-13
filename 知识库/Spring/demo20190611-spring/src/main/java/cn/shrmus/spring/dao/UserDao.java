@@ -1,8 +1,7 @@
 package cn.shrmus.spring.dao;
 
 public class UserDao {
-
-    public void getUserInfo() {
-        System.out.println("UserDao：getUserInfo()");
+    public void execute() {
+        System.out.println("UserDao：execute()");
     }
 }
