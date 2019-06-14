@@ -32,7 +32,7 @@ public class Demo01_ApplicationContext {
 //        constructorArgumentValues.addGenericArgumentValue(userDao);
 //        userServiceBeanDefinition.setConstructorArgumentValues(constructorArgumentValues);
 
-        // property注入
+        // setter方式注入
         MutablePropertyValues propertyValues = new MutablePropertyValues();
         UserDao userDao = (UserDao) applicationContext.getBean("userDao");
         PropertyValue propertyValue = new PropertyValue("userDao",userDao);
