@@ -1,0 +1,5 @@
+Spring自定义标签
+META-INF/spring.handles META-INF/spring.schemas
+1.定义xsd文件
+2.定义解析类，实现BeanDefinitionParser接口，通过BeanDefinitionBuilder创建bean定义beanDefinitionBuilder.genericBeanDefinition，获取自定义标签的属性beanDefinitionBuilder.getBean0Definition，注册bean定义parseContext.registerBeanComponent
+3.定义注册类，继承NameSpaceHandleSupport
