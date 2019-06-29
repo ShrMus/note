@@ -1,0 +1,31 @@
+SpringBoot 2.2 Base on Spring 5.17
+AbstractApplicationContext.refresh invokeBeanFactoryPostProcessors(beanFactory)
+AbstractApplicationContext.invokeBeanFactoryPostProcessors PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors
+PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors invokeBeanFactoryPostProcessors
+PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors postProcessor.postProcessorBeanDefinitionRegistry(registry)
+ConfigurationClassPostProcessor.postProcessorBeanDefinitionRegistry(BeanDefinitionRegistry registry) processConfigBeanDefinitions(registry);
+ConfigurationClassPostProcessor.processConfigBeanDefinitions(BeanDefinitionRegistry registry) parser.parse(candidates);
+ConfigurationClassParser.parse(Set<BeanDefinitionHolder> configCandidates) parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
+ConfigurationClassParser.parse(AnnotationMetadata metadata, String beanName) --> processConfigurationClass(new ConfigurationClass(metadata, beanName));
+ConfigurationClassParser.processConfigurationClass(ConfigurationClass configClass) --> sourceClass = doProcessConfigurationClass(configClass, sourceClass);
+ConfigurationClassParser.doProcessConfigurationClass(configClass, sourceClass) --> this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
+ComponentScanAnnotationParser.public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) --> String[] basePackagesArray = componentScan.getStringArray("basePackages");
+return scanner.doScan(StringUtils.toStringArray(basePackages));
+
+ConfigurationClassParser.doProcessConfigurationClass(configClass, sourceClass) --> parse(holder.getBeanDefinition().getBeanClassName(), holder.getBeanName());
+                                                                                   parse(bdCand.getBeanClassName(), holder.getBeanName());
+return; --> processConfigurationClass(ConfigurationClass configClass)
+return; --> parse(AnnotationMetadata metadata, String beanName)
+return; --> parse(Set<BeanDefinitionHolder> configCandidates)
+
+ConfigurationClassParser.parse(Set<BeanDefinitionHolder> configCandidates) --> this.deferredImportSelectorHandler.process();
+ConfigurationClassParser.process() --> handler.processGroupImports();
+ConfigurationClassParser.processGroupImports() --> processImports(configurationClass, asSourceClass(configurationClass), asSourceClasses(entry.getImportClassName()), false);
+return; --> processGroupImports()
+return; --> process()
+return; --> parse(Set<BeanDefinitionHolder> configCandidates)
+return; --> ConfigurationClassPostProcessor.processConfigBeanDefinitions(BeanDefinitionRegistry registry)
+ConfigurationClassPostProcessor.processConfigBeanDefinitions(BeanDefinitionRegistry registry) --> this.reader.loadBeanDefinitions(configClasses);
+ConfigurationClassBeanDefinitionReader.loadBeanDefinitions(Set<ConfigurationClass> configurationModel) --> loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator);
+
+
