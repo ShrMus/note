@@ -1,5 +1,10 @@
 package cn.shrmus.spring.app;
 
+import org.springframework.context.support.AbstractApplicationContext;
+
+import java.util.ArrayList;
+import java.util.Vector;
+
 /**
  * 元数据方式管理对象间的依赖注入关系 注解管理依赖
  * 在类中使用元数据信息@Inject来标注各个对象之间的依赖关系
@@ -10,6 +15,6 @@ package cn.shrmus.spring.app;
  */
 public class Demo03 {
     public static void main(String[] args) {
-
+//        AbstractApplicationContext
     }
 }
