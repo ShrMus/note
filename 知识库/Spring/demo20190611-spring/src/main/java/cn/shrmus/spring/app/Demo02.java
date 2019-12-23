@@ -23,7 +23,7 @@ public class Demo02 {
 //        userService.getUserInfo();
 //
 //        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
-        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+        ApplicationContext applicationContext = new FileSystemXmlApplicationContext("classpath:applicationContext.xml");
         UserService userService = (UserService) applicationContext.getBean("userService");
         userService.execute();
     }
