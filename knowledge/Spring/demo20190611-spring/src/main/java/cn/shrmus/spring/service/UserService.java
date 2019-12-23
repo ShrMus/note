@@ -6,10 +6,11 @@ public class UserService {
     private UserDao userDao;
 
     public UserService() {
-
+        System.out.println(">>>>>>>>>>>>>>>>>>>UserService()");
     }
 
     public UserService(UserDao userDao) {
+        System.out.println(">>>>>>>>>>>>>>>>>>>UserService(UserDao userDao)");
         this.userDao = userDao;
     }
 
