@@ -80,18 +80,35 @@ Starters是一个方便包含在应用程序中的依赖描述符。
 
 # 3. 代码结构
 本地代码结构如下：
+```
+cn
+ +- shrmus
+     +- springboot
+         +- demo20191222
+             +- Application20191222.java
+             |
+             +- product
+             |   +- Product.java
+             |   +- ProductController.java
+             |   +- ProductService.java
+             |   +- ProductRepository.java
+             |
+             +- user
+                 +- User.java
+                 +- UserController.java
+                 +- UserService.java
+                 +- UserRepository.java
+```
 
-![](https://thumbnail0.baidupcs.com/thumbnail/96f87b76a9c944dc3c590325360df000?fid=3226273652-250528-617198325292244&time=1577098800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-6MdORFR6%2F9eXqZeDDiqT2JqhxUY%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=8275778650118325066&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video)
-
-在```Application.java```文件中声明```main```方法，加上```@SpringBootApplication```注解，如下：
-```Java
-package cn.shrmus.springboot;
+在```Application20191222.java```文件中声明```main```方法，加上```@SpringBootApplication```注解，如下：
+```
+package cn.shrmus.springboot.demo20191222;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Application {
+public class Application20191222 {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
@@ -101,7 +118,7 @@ public class Application {
 # 4. 配置类
 Spring支持基于java的配置，虽然```SpringApplication```可以和XML一起使用，但是建议主源类是一个```@Configuration```类，在主源类中加载其他的配置。通常，定义```main```方法的类可以作为主源类。 <br />
 
-实际上面的```Application```类就是一个```@Configuration```类，因为```@SpringBootApplication```注解基于```@Configuration```注解。
+实际上面的```Application20191222```类就是一个```@Configuration```类，因为```@SpringBootApplication```注解基于```@Configuration```注解。
 
 <span id="4.1"></span>
 ## 4.1 导入其他配置类
@@ -112,8 +129,8 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 ```
 @Import(
     value = {
-        cn.shrmus.springboot.config.MybatisMysqlDataSource.class, 
-        cn.shrmus.springboot.config.MybatisOracleDataSource.class
+        cn.shrmus.springboot.demo20191222.config.MysqlDataSource.class, 
+        cn.shrmus.springboot.demo20191222.config.OracleDataSource.class
     }
 )
 ```
@@ -124,9 +141,9 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 ```
 @ComponentScan(
     value = {
-        "cn.shrmus.springboot.config",
-        "cn.shrmus.springboot.user",
-        "cn.shrmus.springboot.product"
+        "cn.shrmus.springboot.demo20191222.config",
+        "cn.shrmus.springboot.demo20191222.user",
+        "cn.shrmus.springboot.demo20191222.product"
     }
 )
 ```
@@ -134,9 +151,9 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 ```
 @ComponentScan(
     basePackages = {
-        "cn.shrmus.springboot.config",
-        "cn.shrmus.springboot.user",
-        "cn.shrmus.springboot.product"
+        "cn.shrmus.springboot.demo20191222.config",
+        "cn.shrmus.springboot.demo20191222.user",
+        "cn.shrmus.springboot.demo20191222.product"
     }
 )
 ```
@@ -148,60 +165,37 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 ```
 @ComponentScans(
     value = {
-        @ComponentScan(value = {"cn.shrmus.springboot.config"}),
-        @ComponentScan(value = {"cn.shrmus.springboot.user"}),
-        @ComponentScan(value = {"cn.shrmus.springboot.product"})
+        @ComponentScan(value = {"cn.shrmus.springboot.demo20191222.config"}),
+        @ComponentScan(value = {"cn.shrmus.springboot.demo20191222.user"}),
+        @ComponentScan(value = {"cn.shrmus.springboot.demo20191222.product"})
     }
 )
 ```
 
-另外还有```@ConfigurationPropertiesScan```, ```@EntityScan```,读者可以自己尝试怎么使用。
-
-### 4.1.4 @SpringBootApplication
-我在测试上面3个注解的时候，发现一个事情，我把这3个注解都去掉之后，这些类（```@Configuration```类或者说是```@Component```类）还是会获取到，那到底是什么原因，我到网上查了一下，说是带[@SpringBootApplication]()
+### 4.1.4 @ConfigurationPropertiesScan
 
 
-## 4.2 导入XML配置
-如果必须使用基于XML的配置，建议从标记了```@Configuration```的类开始，再使用```@ImportResource```注解加载XML配置文件。 <br />
+另外还有```@ConfigurationPropertiesScan```，```@EnableConfigurationProperties```，```@ConfigurationPropertiesBinding```，```@EntityScan```，```@ImportAutoConfiguration```读者可以自己尝试怎么使用。
 
-### 4.2.1 删除注解
-把```cn.shrmus.springboot.config.MybatisMysqlDataSource```类和```cn.shrmus.springboot.config.MybatisOracleDataSource```的```@Configuration```注解去掉，确保XML配置有效。
 
-### 4.2.2 新建XML配置文件
-在==resources==文件夹中新建两个spring配置文件，主要为了表示```@Configuration```注解值是个数组类型。
 
-==applicationContext-mybatisMysqlDataSource.xml==文件：
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
-
-	<bean id="mybatisMysqlDataSource" class="cn.shrmus.springboot.config.MybatisMysqlDataSource"></bean>
-</beans>
-```
-
-==applicationContext-mybatisOracleDataSource.xml==文件：
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
-
-	<bean id="mybatisOracleDataSource" class="cn.shrmus.springboot.config.MybatisOracleDataSource"></bean>
-</beans>
-```
-
-### 4.2.1 @ImportResource
-用```@ImportResource```注解导入XML配置文件，用法如下：
+## 4.2 导入XML文件
+如果必须使用基于XML的配置，建议从标记了```@Configuration```的类开始，再使用```@ImportResource```注解加载XML配置文件，用法如下：
 ```
 @ImportResource(
     value = {
-        "classpath:config/spring/applicationContext-mybatisMysqlDataSource.xml.xml",
-        "classpath:config/spring/applicationContext-mybatisOracleDataSource.xml.xml"
+        "classpath:config/spring/applicationContext-MysqlDataSource.xml",
+        "classpath:config/spring/applicationContext-OracleDataSource.xml"
     }
 )
 ```
+
+## 4.3 导入properties文件
+如果必须使用properties文件，而这个文件又是自定义的，可以用```@PropertySource```注解，用法如下：
+```
+@PropertySource(value = "config/dataSource/mysqlDataSource.properties")
+```
+如果配置信息在```application.properties```中，则可以省略此注解。
 
 # 5. 自动配置
 Spring Boot自动配置是基于你添加的jar依赖尝试去做自动配置。
@@ -213,10 +207,10 @@ Spring Boot自动配置是基于你添加的jar依赖尝试去做自动配置。
 在```classpath```中下新建一个==META-INF==目录，在这个目录下新建一个```spring.factories```文件。
 ```
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.shrmus.springboot.autoconfigure.MybatisMysqlDataSourceAutoConfiguration
+cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
 ```
 
-如果你需要了解当前应用的是什么自动配置，以及为什么，请使用```--debug```开关启动您的应用程序。这样做可以为选择的核心日志记录器启用调试日志，并将条件报告记录到控制台。
+- [ ] 如果你需要了解当前应用的是什么自动配置，以及为什么，请使用```--debug```开关启动您的应用程序。这样做可以为选择的核心日志记录器启用调试日志，并将条件报告记录到控制台。
 
 ## 5.2 禁用特定的自动配置类
 如果你发现你不想要的特定的自动配置类被应用，你可以使用```@EnableAutoConfiguration```的```exclude```属性来禁用它们，如下面的例子所示：
@@ -228,14 +222,65 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-public class MybatisMysqlDataSource {
+@EnableAutoConfiguration(exclude = {cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration.class})
+public class MysqlDataSource {
 }
 ```
 
 如果要禁用的类不在```classpath```中，也可以使用```excludeName```属性指定类的全限定名，用法如下：
 ```
-@SpringBootApplication(excludeName = "org.springframework.boot.autoconfigure.aop.AopAutoConfiguration")
+@SpringBootApplication(excludeName = "cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration")
 ```
 
-还可以使用```spring.autoconfigure.exclude```来控制要排除的自动配置类列表。用法如下：
+还可以使用```spring.autoconfigure.exclude```来控制要排除的自动配置类列表。在```application.properes```文件中，用法如下：
+```
+spring.autoconfigure.exclude=cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
+```
+
+# 6. Spring Bean和依赖注入
+所有应用程序组件（```@Component```、```@Service```、```@Repository```、```@Controller```等)都自动注册为Spring bean。
+
+下面用构造方法注入来获得一个UserRepository Bean：
+```
+package cn.shrmus.springboot.demo20191222.user;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService implements IUserService{
+    
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+```
+如果bean只有一个构造方法，可以省略```@Autowired```。
+
+# 7. 使用@SpringBootApplication注解
+使用```@SpringBootApplication```注解可以启用这三个特性：
+- ```@EnableAutoConfiguration```：启用Spring Boot的自动配置机制。
+- ```@ComponentScan```：开启扫描，在应用程序的包中扫描```@Component```类。
+- ```@Configuration```：允许在上下文中注册额外的bean或导入额外的配置类。
+
+
+如果你不想在应用程序中使用```@Component```扫描或```@ConfigurationProperties```扫描：
+```
+package cn.shrmus.springboot.demo20191222;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableAutoConfiguration
+public class Application20191222 {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+这时候会发现，==user==包和==product==包中的```@Component```类都没有注入到容器中。

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.shrmus.springboot.autoconfigure.MybatisMysqlDataSourceAutoConfiguration
+cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration

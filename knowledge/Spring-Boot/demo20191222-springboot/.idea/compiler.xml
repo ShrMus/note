@@ -6,15 +6,21 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="demo20191222-springboot" />
         <module name="demo20190924-springboot" />
+        <module name="demo20191222-springboot" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="demo20191224-springboot" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
+    <option name="DEPRECATION" value="false" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-Xdebug" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="demo20190924-springboot" options="-parameters" />
       <module name="demo20191222-springboot" options="" />
+      <module name="demo20191224-springboot" options="" />
     </option>
   </component>
 </project>

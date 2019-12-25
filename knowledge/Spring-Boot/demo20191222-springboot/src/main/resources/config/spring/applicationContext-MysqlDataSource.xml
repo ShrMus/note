@@ -3,5 +3,5 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="mybatisMysqlDataSource" class="cn.shrmus.springboot.config.MybatisMysqlDataSource"></bean>
+	<bean id="mybatisMysqlDataSource" class="cn.shrmus.springboot.demo20191222.config.MysqlDataSource"></bean>
 </beans>

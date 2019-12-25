@@ -1,4 +1,4 @@
-package cn.shrmus.springboot.product;
+package cn.shrmus.springboot.demo20191222.product;
 
 import org.springframework.stereotype.Repository;
 
