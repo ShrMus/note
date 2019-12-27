@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@Configuration
+//@Configuration
 @PropertySource(value = "config/dataSource/mysqlDataSource.properties")
 @ConfigurationProperties(prefix = MysqlDataSourceProperties.PREFIX)
 @Data

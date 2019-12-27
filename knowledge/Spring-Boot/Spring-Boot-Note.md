@@ -210,7 +210,12 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
 ```
 
-- [ ] 如果你需要了解当前应用的是什么自动配置，以及为什么，请使用```--debug```开关启动您的应用程序。这样做可以为选择的核心日志记录器启用调试日志，并将条件报告记录到控制台。
+如果你需要了解当前应用的是什么自动配置，以及为什么，请使用```--debug```开关启动您的应用程序。这样做可以为选择的核心日志记录器启用调试日志，并将条件报告记录到控制台。
+
+**启动```--debug```的配置方式**： <br />
+菜单[**Run**]-->[**Edit Configurations**] <br />
+[**Configuration**]选项卡-->展开[**Environment**] <br />
+在[**Program arguments**]填入```--debug``` <br />
 
 ## 5.2 禁用特定的自动配置类
 如果你发现你不想要的特定的自动配置类被应用，你可以使用```@EnableAutoConfiguration```的```exclude```属性来禁用它们，如下面的例子所示：
@@ -284,3 +289,65 @@ public class Application20191222 {
 }
 ```
 这时候会发现，==user==包和==product==包中的```@Component```类都没有注入到容器中。
+
+# 8. 运行应用程序
+本节只讨论基于jar的打包。如果选择将应用程序打包为war文件，应该参考服务器和IDE文档。
+
+**打包方案一：** <br />
+打开[**File**]菜单-->[**Project Structure**]，弹出[**Project Structure**]对话框 <br />
+在对话框左侧选择[**Project Settings**]中的[**Artifacts**] <br />
+点击[**+**]-->[**Jar**]-->[**From modules with dependencies**]，弹出[**Create JAR from Modules**]对话框 <br />
+在对话框中选择[**Module**]和[**Main Class**]，然后[**Directory for META-INF/MANIFEST.SF**]从不可选变成可选状态，这个选项中的路径是创建```MANIFEST.SF```文件的路径 <br />
+点击OK之后项目会在[**Directory for META-INF/MANIFEST.SF**]项的路径下创建==META-INF==目录，在此目录下创建```MANIFEST.SF```文件，而文件中的内容就是启动类的配置信息呵呵版本信息 <br />
+回到[**Project Structure**]对话框，多了一项刚刚创建的信息，[**Output derectory**]是JAR的输出路径，点击OK <br />
+点击菜单[**Build**]-->[**Build Artifacts**]，选择[**Build**]，至此，JAR就打好了。 <br />
+
+**打包方案二：** <br />
+如果是继承```spring-boot-starter-parent```，只需在POM中添加
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+```
+
+**打包方案三：** <br />
+如果不是继承```spring-boot-starter-parent```而是使用依赖管理```spring-boot-dependencies```，则添加：
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <!-- 启动类的全限定名 -->
+                <mainClass>cn.shrmus.springboot.demo20191222.Application20191222</mainClass>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>repackage</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+
+## 8.1 运行打包的应用程序
+创建jar后，你可以使用```java -jar```来运行您的应用程序，如下面的例子所示:
+```
+java -jar target/demo20191222-springboot-1.0-SNAPSHOT.jar
+```
+
+还可以在启用远程调试支持的情况下运行打包的应用程序。这样做可以将调试器附加到打包的应用程序中，如下面的示例所示：
+```
+java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -jar target/demo20191222-springboot-1.0-SNAPSHOT.jar
+```
+
+## 8.2 使用Maven插件
