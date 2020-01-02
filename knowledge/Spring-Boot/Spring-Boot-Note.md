@@ -1,31 +1,40 @@
 **==Spring Boot (0) 初探==**
 
 [TOC]
+
 > 摘要
 
 # 1. Spring Boot的诞生
+
 在学习Spring Boot之前先提出几个问题： <br />
-1. Spring Boot是什么
-2. 为什么要使用Spring Boot
-3. Spring Boot能做什么
+
+1. Spring Boot是什么 <br />
+2. 为什么要使用Spring Boot <br />
+3. Spring Boot能做什么 <br />
 
 在此，我找了几篇文章（鄙人没有经历过互联网项目架构的演变，只能从别人的文章中学习）： <br />
 为什么会出现Spring Boot：[http://www.sohu.com/a/212136259_100090656](http://www.sohu.com/a/212136259_100090656) <br />
+
 为什么越来越多的开发者选择使用Spring Boot？：</font>[https://blog.csdn.net/xlgen157387/article/details/52830071](https://blog.csdn.net/xlgen157387/article/details/52830071) <br />
 
 # 2. 怎么使用Spring Boot
+
 了解了上述几个问题之后，下一步了解怎么去使用。
 [Spring Boot官方文档](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/using-spring-boot.html#using-boot)
 
 ## 2.1 环境要求
+
 - JDK 1.8或以上
 - Maven 3.2或以上
 
 ## 2.2 构建系统
+
 官方文档中提供了几种构建方式，这里使用Maven构建。
 
 ### 2.2.1 配置spring-boot-starter-parent
+
 继承一个父工程，POM配置：
+
 ```xml
 <!-- Inherit defaults from Spring Boot -->
 <parent>
@@ -38,6 +47,7 @@
 ### 2.2.2 不配置spring-boot-starter-parent
 
 在公司中你的项目可能已经配置了一个父工程，而那个父工程没有依赖Spring Boot，那么可以使用这种方式：
+
 ```xml
 <dependencyManagement>
     <dependencies>
@@ -52,11 +62,13 @@
     </dependencies>
 </dependencyManagement>
 ```
+
 如果你看```spring-boot-starter-parent```的POM文件，会发现它继承```spring-boot-dependencies```。
 
 ### 2.2.3 使用Spring Boot Maven插件
 
 Spring Boot包含一个Maven插件，它可以将项目打包为一个可执行jar。如果要使用插件，请将其添加到&lt;plugins&gt;部分，如下例所示：
+
 ```xml
 <build>
     <plugins>
@@ -72,18 +84,22 @@ Spring Boot包含一个Maven插件，它可以将项目打包为一个可执行j
 
 Starters是一个方便包含在应用程序中的依赖描述符。
 你可以一次性获得所需的所有Spring和相关技术。例如你要构建一个Web应用程序，在你的工程POM文件中加入```spring-boot-starter-web```依赖。
+
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
 ```
+
 它包含许多依赖项，把所有你需要依赖的包都包含了，看看```spring-boot-starter-web```的POM文件里面就可以找到它依赖了```spring-web```和```spring-webmvc```等。
 
 所有官方的starters都类似```spring-boot-starter-*```这种方式命名。[官方文档](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/using-spring-boot.html#using-boot-starter)中列出了常用的。
 
 # 3. 代码结构
+
 本地代码结构如下：
+
 ```properties
 cn
  +- shrmus
@@ -105,6 +121,7 @@ cn
 ```
 
 在```Application20191222.java```文件中声明```main```方法，加上```@SpringBootApplication```注解，如下：
+
 ```java
 package cn.shrmus.springboot.demo20191222;
 
@@ -128,10 +145,13 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 <span id="4.1"></span>
 
 ## 4.1 导入其他配置类
+
 不建议把所有配置都放在一个类中，就像XML配置不建议把配置信息都存在一个文件中，可以用```@Import```注解导入其他配置类，或者可以使用```@ComponentScan```来自动获取所有Spring组件，包括标记了```@Configuration```的类，也可以说是```@Component```类。
 
 ### 4.1.1 @Import
+
 用法如下：
+
 ```java
 @Import(
     value = {
@@ -140,11 +160,13 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
     }
 )
 ```
+
 前提是```value```中的类都是标记了```@Configuration```的类。
 
 ### 4.1.2 @ComponentScan
 
 用法如下：
+
 ```java
 @ComponentScan(
     value = {
@@ -154,7 +176,9 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
     }
 )
 ```
+
 或者
+
 ```java
 @ComponentScan(
     basePackages = {
@@ -164,9 +188,11 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
     }
 )
 ```
+
 上面的```value```和```basePackages```等价。```@ComponentScan```还有其他的用法，就需要读者自己去摸索了。
 
 ### 4.1.3 @ComponentScans
+
 可以声明多个```@ComponentScan```，用法如下：
 
 ```java
@@ -187,7 +213,9 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 
 
 ## 4.2 导入XML文件
+
 如果必须使用基于XML的配置，建议从标记了```@Configuration```的类开始，再使用```@ImportResource```注解加载XML配置文件，用法如下：
+
 ```java
 @ImportResource(
     value = {
@@ -200,9 +228,11 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 ## 4.3 导入properties文件
 
 如果必须使用properties文件，而这个文件又是自定义的，可以用```@PropertySource```注解，用法如下：
+
 ```java
 @PropertySource(value = "config/dataSource/mysqlDataSource.properties")
 ```
+
 如果配置信息在```application.properties```中，则可以省略此注解。
 
 # 5. 自动配置
@@ -212,8 +242,10 @@ Spring Boot自动配置是基于你添加的jar依赖尝试去做自动配置。
 你可以选择```@EnableAutoConfiguration```或```@SpringBootApplication```注解加入到```@Configuration```类中。
 
 ## 5.1 替换自动配置
+
 你可以定义自己的配置来替换自动配置的特定部分。
 在```classpath```中下新建一个==META-INF==目录，在这个目录下新建一个```spring.factories```文件。
+
 ```properties
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
@@ -222,12 +254,14 @@ cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
 如果你需要了解当前应用的是什么自动配置，以及为什么，请使用```--debug```开关启动您的应用程序。这样做可以为选择的核心日志记录器启用调试日志，并将条件报告记录到控制台。
 
 **启动```--debug```的配置方式**： <br />
-菜单[**Run**]-->[**Edit Configurations**] <br />
-[**Configuration**]选项卡-->展开[**Environment**] <br />
-在[**Program arguments**]填入```--debug``` <br />
+1. 菜单[**Run**]-->[**Edit Configurations**] <br />
+2. [**Configuration**]选项卡-->展开[**Environment**] <br />
+3. 在[**Program arguments**]填入```--debug``` <br />
 
 ## 5.2 禁用特定的自动配置类
+
 如果你发现你不想要的特定的自动配置类被应用，你可以使用```@EnableAutoConfiguration```的```exclude```属性来禁用它们，如下面的例子所示：
+
 ```java
 package cn.shrmus.springboot.config;
 
@@ -242,11 +276,13 @@ public class MysqlDataSource {
 ```
 
 如果要禁用的类不在```classpath```中，也可以使用```excludeName```属性指定类的全限定名，用法如下：
+
 ```java
 @SpringBootApplication(excludeName = "cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration")
 ```
 
 还可以使用```spring.autoconfigure.exclude```来控制要排除的自动配置类列表。在```application.properes```文件中，用法如下：
+
 ```properties
 spring.autoconfigure.exclude=cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
 ```
@@ -256,6 +292,7 @@ spring.autoconfigure.exclude=cn.shrmus.springboot.demo20191222.autoconfigure.Mys
 所有应用程序组件（```@Component```、```@Service```、```@Repository```、```@Controller```等)都自动注册为Spring bean。
 
 下面用构造方法注入来获得一个UserRepository Bean：
+
 ```java
 package cn.shrmus.springboot.demo20191222.user;
 
@@ -273,16 +310,20 @@ public class UserService implements IUserService{
     }
 }
 ```
+
 如果bean只有一个构造方法，可以省略```@Autowired```。
 
 # 7. 使用@SpringBootApplication注解
+
 使用```@SpringBootApplication```注解可以启用这三个特性：
+
 - ```@EnableAutoConfiguration```：启用Spring Boot的自动配置机制。
 - ```@ComponentScan```：开启扫描，在应用程序的包中扫描```@Component```类。
 - ```@Configuration```：允许在上下文中注册额外的bean或导入额外的配置类。
 
 
 如果你不想在应用程序中使用```@Component```扫描或```@ConfigurationProperties```扫描：
+
 ```java
 package cn.shrmus.springboot.demo20191222;
 
@@ -298,23 +339,28 @@ public class Application20191222 {
     }
 }
 ```
+
 这时候会发现，==user==包和==product==包中的```@Component```类都没有注入到容器中。
 
 # 8. 运行应用程序
 
 本节只讨论基于jar的打包。如果选择将应用程序打包为war文件，应该参考服务器和IDE文档。
 
+## 8.1 打包应用程序
+
 **打包方案一：** <br />
-打开[**File**]菜单-->[**Project Structure**]，弹出[**Project Structure**]对话框 <br />
-在对话框左侧选择[**Project Settings**]中的[**Artifacts**] <br />
-点击[**+**]-->[**Jar**]-->[**From modules with dependencies**]，弹出[**Create JAR from Modules**]对话框 <br />
-在对话框中选择[**Module**]和[**Main Class**]，然后[**Directory for META-INF/MANIFEST.SF**]从不可选变成可选状态，这个选项中的路径是创建```MANIFEST.SF```文件的路径 <br />
-点击OK之后项目会在[**Directory for META-INF/MANIFEST.SF**]项的路径下创建==META-INF==目录，在此目录下创建```MANIFEST.SF```文件，而文件中的内容就是启动类的配置信息呵呵版本信息 <br />
-回到[**Project Structure**]对话框，多了一项刚刚创建的信息，[**Output derectory**]是JAR的输出路径，点击OK <br />
-点击菜单[**Build**]-->[**Build Artifacts**]，选择[**Build**]，至此，JAR就打好了。 <br />
+1. 打开[**File**]菜单-->[**Project Structure**]，弹出[**Project Structure**]对话框 <br />
+2. 在对话框左侧选择[**Project Settings**]中的[**Artifacts**] <br />
+3. 点击[**+**]-->[**Jar**]-->[**From modules with dependencies**]，弹出[**Create JAR from Modules**]对话框 <br />
+4. 在对话框中选择[**Module**]和[**Main Class**]，然后[**Directory for META-INF/MANIFEST.SF**]从不可选变成可选状态，这个选项中的路径是创建```MANIFEST.SF```文件的路径 <br />
+5. 点击OK之后项目会在[**Directory for META-INF/MANIFEST.SF**]项的路径下创建==META-INF==目录，在此目录下创建```MANIFEST.SF```文件，而文件中的内容就是启动类的配置信息呵呵版本信息 <br />
+6. 回到[**Project Structure**]对话框，多了一项刚刚创建的信息，[**Output derectory**]是JAR的输出路径，点击OK <br />
+7. 点击菜单[**Build**]-->[**Build Artifacts**]，选择[**Build**]，至此，JAR就打好了。 <br />
+
 
 **打包方案二：** <br />
 如果是继承```spring-boot-starter-parent```，只需在POM中添加
+
 ```xml
 <build>
     <plugins>
@@ -325,6 +371,7 @@ public class Application20191222 {
     </plugins>
 </build>
 ```
+
 
 **打包方案三：** <br />
 如果不是继承```spring-boot-starter-parent```而是使用依赖管理```spring-boot-dependencies```，则添加：
@@ -351,7 +398,8 @@ public class Application20191222 {
 </build>
 ```
 
-## 8.1 运行打包的应用程序
+## 8.2 运行打包的应用程序
+
 创建jar后，你可以使用```java -jar```来运行您的应用程序，如下面的例子所示:
 ```shell
 java -jar target/demo20191222-springboot-1.0-SNAPSHOT.jar
@@ -362,4 +410,54 @@ java -jar target/demo20191222-springboot-1.0-SNAPSHOT.jar
 java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -jar target/demo20191222-springboot-1.0-SNAPSHOT.jar
 ```
 
-## 8.2 使用Maven插件
+## 8.3 使用Maven插件
+
+### 8.3.1 用Maven命令启动应用程序
+```shell
+mvn spring-boot:run
+```
+
+IDEA开发工具中用Maven命令运行应用程序的方式：
+
+**方式一：** <br />
+1. 在[**Maven**]窗口中点击[**Execute Maven Goal**]按钮，按钮图标是个M字母的形状 <br />
+2. 在弹出的[**Execute Maven Goal**]对话框中，[**Working directory**]选择要运行的应用程序目录，[**Command line**]中输入```spring-boot:run``` <br />
+
+**方式二：**
+1. 在[**Maven**]窗口中展开要运行的应用程序，选择[**Plugins**]-->[**spring-boot**]-->[**spring-boot:run**] <br />
+2. 双击[**spring-boot:run**] <br />
+
+**方式三：**
+1. 菜单[**Run**]-->[**Edit Configurations**] <br />
+2. 在[**Run/Debug Configurations**]对话框中，选择左侧的[**+**]-->[**Add New Configuration**]-->[**Maven**] <br />
+3. 输入[**Name**]，在[**Parameters**]选项卡中，[**Working directory**]选择要运行的应用程序目录，[**Command line**]中输入```spring-boot:run``` <br />
+4. 在工具栏[**运行**]按钮左侧选择刚刚配置的Maven Configuratiion，点击[**运行**]按钮 <br />
+
+### 8.3.2 使用MAVEN_OPTS操作系统环境变量
+```shell
+export MAVEN_OPTS=-Xmx1024m
+```
+
+# 9. 热部署
+在程序运行过程中交换字节码，可使用JRebel。
+
+使用```spring-boot-devtools```模块支持快速重启应用程序。
+
+# 10. 开发工具
+添加```spring-boot-devtools```模块可以使应用程序开发体验更愉快。
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+        <optional>true</optional>
+    </dependency>
+</dependencies>
+```
+
+在运行完全打包的应用程序时，将自动禁用开发人员工具。如果您的应用程序是从```java -jar```启动的，或者是从一个特殊的类加载器启动的，那么它就被认为是一个“生产应用程序”，如果您在容器中运行应用程序，可以排除devtools或设置```Dspring.devtools.restart.enabled=false```。
+
+默认情况下，重新打包的归档文件不包含devtools。如果您想使用某个远程devtools特性，您需要禁用```excludeDevtools```构建属性来包含它。该属性同时受到Maven和Gradle插件的支持。
+
+## 10.1 属性默认值
+
