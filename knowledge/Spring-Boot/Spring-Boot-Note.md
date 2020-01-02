@@ -1,4 +1,5 @@
 **==Spring Boot (0) 初探==**
+
 [TOC]
 > 摘要
 
@@ -25,7 +26,7 @@
 
 ### 2.2.1 配置spring-boot-starter-parent
 继承一个父工程，POM配置：
-```
+```xml
 <!-- Inherit defaults from Spring Boot -->
 <parent>
     <groupId>org.springframework.boot</groupId>
@@ -35,8 +36,9 @@
 ```
 
 ### 2.2.2 不配置spring-boot-starter-parent
+
 在公司中你的项目可能已经配置了一个父工程，而那个父工程没有依赖Spring Boot，那么可以使用这种方式：
-```
+```xml
 <dependencyManagement>
     <dependencies>
         <dependency>
@@ -53,8 +55,9 @@
 如果你看```spring-boot-starter-parent```的POM文件，会发现它继承```spring-boot-dependencies```。
 
 ### 2.2.3 使用Spring Boot Maven插件
+
 Spring Boot包含一个Maven插件，它可以将项目打包为一个可执行jar。如果要使用插件，请将其添加到&lt;plugins&gt;部分，如下例所示：
-```
+```xml
 <build>
     <plugins>
         <plugin>
@@ -66,9 +69,10 @@ Spring Boot包含一个Maven插件，它可以将项目打包为一个可执行j
 ```
 
 ### 2.2.4 Starters
+
 Starters是一个方便包含在应用程序中的依赖描述符。
 你可以一次性获得所需的所有Spring和相关技术。例如你要构建一个Web应用程序，在你的工程POM文件中加入```spring-boot-starter-web```依赖。
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
@@ -80,7 +84,7 @@ Starters是一个方便包含在应用程序中的依赖描述符。
 
 # 3. 代码结构
 本地代码结构如下：
-```
+```properties
 cn
  +- shrmus
      +- springboot
@@ -101,7 +105,7 @@ cn
 ```
 
 在```Application20191222.java```文件中声明```main```方法，加上```@SpringBootApplication```注解，如下：
-```
+```java
 package cn.shrmus.springboot.demo20191222;
 
 import org.springframework.boot.SpringApplication;
@@ -116,17 +120,19 @@ public class Application20191222 {
 ```
 
 # 4. 配置类
+
 Spring支持基于java的配置，虽然```SpringApplication```可以和XML一起使用，但是建议主源类是一个```@Configuration```类，在主源类中加载其他的配置。通常，定义```main```方法的类可以作为主源类。 <br />
 
 实际上面的```Application20191222```类就是一个```@Configuration```类，因为```@SpringBootApplication```注解基于```@Configuration```注解。
 
 <span id="4.1"></span>
+
 ## 4.1 导入其他配置类
 不建议把所有配置都放在一个类中，就像XML配置不建议把配置信息都存在一个文件中，可以用```@Import```注解导入其他配置类，或者可以使用```@ComponentScan```来自动获取所有Spring组件，包括标记了```@Configuration```的类，也可以说是```@Component```类。
 
 ### 4.1.1 @Import
 用法如下：
-```
+```java
 @Import(
     value = {
         cn.shrmus.springboot.demo20191222.config.MysqlDataSource.class, 
@@ -137,8 +143,9 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 前提是```value```中的类都是标记了```@Configuration```的类。
 
 ### 4.1.2 @ComponentScan
+
 用法如下：
-```
+```java
 @ComponentScan(
     value = {
         "cn.shrmus.springboot.demo20191222.config",
@@ -148,7 +155,7 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 )
 ```
 或者
-```
+```java
 @ComponentScan(
     basePackages = {
         "cn.shrmus.springboot.demo20191222.config",
@@ -162,7 +169,7 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 ### 4.1.3 @ComponentScans
 可以声明多个```@ComponentScan```，用法如下：
 
-```
+```java
 @ComponentScans(
     value = {
         @ComponentScan(value = {"cn.shrmus.springboot.demo20191222.config"}),
@@ -181,7 +188,7 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 
 ## 4.2 导入XML文件
 如果必须使用基于XML的配置，建议从标记了```@Configuration```的类开始，再使用```@ImportResource```注解加载XML配置文件，用法如下：
-```
+```java
 @ImportResource(
     value = {
         "classpath:config/spring/applicationContext-MysqlDataSource.xml",
@@ -191,13 +198,15 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 ```
 
 ## 4.3 导入properties文件
+
 如果必须使用properties文件，而这个文件又是自定义的，可以用```@PropertySource```注解，用法如下：
-```
+```java
 @PropertySource(value = "config/dataSource/mysqlDataSource.properties")
 ```
 如果配置信息在```application.properties```中，则可以省略此注解。
 
 # 5. 自动配置
+
 Spring Boot自动配置是基于你添加的jar依赖尝试去做自动配置。
 
 你可以选择```@EnableAutoConfiguration```或```@SpringBootApplication```注解加入到```@Configuration```类中。
@@ -205,7 +214,7 @@ Spring Boot自动配置是基于你添加的jar依赖尝试去做自动配置。
 ## 5.1 替换自动配置
 你可以定义自己的配置来替换自动配置的特定部分。
 在```classpath```中下新建一个==META-INF==目录，在这个目录下新建一个```spring.factories```文件。
-```
+```properties
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
 ```
@@ -219,7 +228,7 @@ cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
 
 ## 5.2 禁用特定的自动配置类
 如果你发现你不想要的特定的自动配置类被应用，你可以使用```@EnableAutoConfiguration```的```exclude```属性来禁用它们，如下面的例子所示：
-```
+```java
 package cn.shrmus.springboot.config;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -233,20 +242,21 @@ public class MysqlDataSource {
 ```
 
 如果要禁用的类不在```classpath```中，也可以使用```excludeName```属性指定类的全限定名，用法如下：
-```
+```java
 @SpringBootApplication(excludeName = "cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration")
 ```
 
 还可以使用```spring.autoconfigure.exclude```来控制要排除的自动配置类列表。在```application.properes```文件中，用法如下：
-```
+```properties
 spring.autoconfigure.exclude=cn.shrmus.springboot.demo20191222.autoconfigure.MysqlDataSourceAutoConfiguration
 ```
 
 # 6. Spring Bean和依赖注入
+
 所有应用程序组件（```@Component```、```@Service```、```@Repository```、```@Controller```等)都自动注册为Spring bean。
 
 下面用构造方法注入来获得一个UserRepository Bean：
-```
+```java
 package cn.shrmus.springboot.demo20191222.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -273,7 +283,7 @@ public class UserService implements IUserService{
 
 
 如果你不想在应用程序中使用```@Component```扫描或```@ConfigurationProperties```扫描：
-```
+```java
 package cn.shrmus.springboot.demo20191222;
 
 import org.springframework.boot.SpringApplication;
@@ -291,6 +301,7 @@ public class Application20191222 {
 这时候会发现，==user==包和==product==包中的```@Component```类都没有注入到容器中。
 
 # 8. 运行应用程序
+
 本节只讨论基于jar的打包。如果选择将应用程序打包为war文件，应该参考服务器和IDE文档。
 
 **打包方案一：** <br />
@@ -304,7 +315,7 @@ public class Application20191222 {
 
 **打包方案二：** <br />
 如果是继承```spring-boot-starter-parent```，只需在POM中添加
-```
+```xml
 <build>
     <plugins>
         <plugin>
@@ -317,7 +328,8 @@ public class Application20191222 {
 
 **打包方案三：** <br />
 如果不是继承```spring-boot-starter-parent```而是使用依赖管理```spring-boot-dependencies```，则添加：
-```
+
+```xml
 <build>
     <plugins>
         <plugin>
@@ -341,12 +353,12 @@ public class Application20191222 {
 
 ## 8.1 运行打包的应用程序
 创建jar后，你可以使用```java -jar```来运行您的应用程序，如下面的例子所示:
-```
+```shell
 java -jar target/demo20191222-springboot-1.0-SNAPSHOT.jar
 ```
 
 还可以在启用远程调试支持的情况下运行打包的应用程序。这样做可以将调试器附加到打包的应用程序中，如下面的示例所示：
-```
+```shell
 java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -jar target/demo20191222-springboot-1.0-SNAPSHOT.jar
 ```
 
