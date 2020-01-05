@@ -56,13 +56,14 @@ public class Application20191222 {
 
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(args);
 
-        System.out.println("Spring Boot默认提供的Bean：");
-        String[] beanDefinitionNames = configurableApplicationContext.getBeanDefinitionNames();
-        Arrays.sort(beanDefinitionNames);
-        Arrays.stream(beanDefinitionNames).forEach(System.out::println);
+//        System.out.println("Spring Boot默认提供的Bean：");
+//        String[] beanDefinitionNames = configurableApplicationContext.getBeanDefinitionNames();
+//        Arrays.sort(beanDefinitionNames);
+//        Arrays.stream(beanDefinitionNames).forEach(System.out::println);
 
-        MysqlDataSource bean = configurableApplicationContext.getBean(MysqlDataSource.class);
-        bean.function();
-        System.exit(SpringApplication.exit(configurableApplicationContext));
+//        MysqlDataSource bean = configurableApplicationContext.getBean(MysqlDataSource.class);
+//        bean.function();
+
+//        System.exit(SpringApplication.exit(configurableApplicationContext));
     }
 }

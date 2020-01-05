@@ -142,7 +142,6 @@ Spring支持基于java的配置，虽然```SpringApplication```可以和XML一�
 
 实际上面的```Application20191222```类就是一个```@Configuration```类，因为```@SpringBootApplication```注解基于```@Configuration```注解。
 
-<span id="4.1"></span>
 ## 4.1 导入其他配置类
 
 不建议把所有配置都放在一个类中，就像XML配置不建议把配置信息都存在一个文件中，可以用```@Import```注解导入其他配置类，或者可以使用```@ComponentScan```来自动获取所有Spring组件，包括标记了```@Configuration```的类，也可以说是```@Component```类。
@@ -478,13 +477,14 @@ Spring Boot支持的几个库使用缓存来提高性能。例如，模板引擎
 
 使用```spring-boot-devtools```的应用程序会使在==classpath==中的文件发生更改时自动重新启动。默认情况下，==classpath==中指向文件夹的任何条目都将被监视，以查看是否有更改。某些资源（如静态资产和视图模板）不需要重新启动应用程序。
 
+<span id="10.2_自动重启"></span>
 **触发重启** <br />
 由于DevTools监视类路径资源，触发重新启动的惟一方法是更新类路径。更新类路径的方式取决于所使用的IDE。 <br />
 
 在Eclipse中，保存修改后的文件将导致更新类路径并触发重启。 <br />
 在IntelliJ IDEA中，构建项目（菜单[**Build**]-->[**Build Project**]）具有相同的效果。
 
-与[LiveReload]()一起使用时，自动重启效果非常好。如果使用JRebel，则禁用自动重新启动，以便动态类重新加载。其他devtools特性(如LiveReload和属性覆盖)仍然可以使用。
+与[LiveReload](#10.3_LiveReload)一起使用时，自动重启效果非常好。如果使用JRebel，则禁用自动重新启动，以便动态类重新加载。其他devtools特性(如LiveReload和属性覆盖)仍然可以使用。
 
 DevTools在重启时依赖于应用程序上下文的shutdown hook去关闭。如果禁用了shutdown hook（```SpringApplication.setRegisterShutdownHook(false)```）它将无法正常工作。
 
@@ -590,13 +590,14 @@ restart.include.projectcommon=/mycorp-myproj-[\\w\\d-\.]+\.jar
 
 ==classpath==下所有的```META-INF/spring-devtools.properties```都会被加载，你可以将文件打包到项目内部或项目使用的库中。
 
-### 10.2.7 已知缺陷
+### 10.2.7 已知局限性
 
 使用标准ObjectInputStream反序列化的对象，重新启动功能不能很好地工作。<br/>
 如果需要反序列化数据，可能需要结合使用Spring的```ConfigurableObjectInputStream```和```Thread.currentThread().getcontextclassloader()```。<br/>
 
 不幸的是，一些第三方库在反序列化时没有考虑上下文类加载器。如果您发现这样的问题，您需要向原始作者请求修复。
 
+<span id="10.3_LiveReload"></span>
 ## 10.3 LiveReload
 
 模块```spring-boot-devtools```包含一个内嵌的LiveReload服务器，可以用来在资源更改时触发浏览器刷新。<br/>
@@ -626,6 +627,82 @@ spring.devtools.restart.trigger-file=.reloadtrigger
 在上述文件中激活的配置文件不会影响加载[特定的配置文件](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-profile-specific-properties)
 
 ## 10.5 远程应用程序
+远程代码更新的意思是，在本地IDE修改代码，可以自动更新到服务器上，并且自动重启生效。就像在本地开发环境一样。(来自[Spring Boot Remote Application](https://blog.csdn.net/quqtalk/article/details/84877102))
+
+Spring Boot developer tools并不局限于本地开发。在运行远程应用程序时，你还可以使用一些特性。<br/>
+远程支持是可选的，因为启用它可能存在安全风险。仅当在受信任的网络上运行或使用SSL进行保护时，才应该启用它。如果这两个选项都不可用，就不应该在生产环境上使用DevTools的远程支持。<br/>
+要启用它，您需要确保重新打包的归档文件中包含```devtools```，如下所示：
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <excludeDevtools>false</excludeDevtools>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
+然后设置```spring.devtools.remote.secret```属性，与任何重要的密码或秘密一样，该值应该是惟一的、强的，这样就不会被猜测或强行使用。
+
+远程devtools支持由两部分支持：
+等待连接的服务端结点和在你的IDE中运行的客户端应用程序。<br/>
+当设置```spring.devtools.remote.secret```属性时，服务器组件将自动启用。客户端组件必须手动启动。
+
+### 10.5.1 运行远程客户端应用程序
+远程客户端应用程序需要与你连接的远程应用程序具有相同的==classpath==。在==classpath==中运行```org.springframework.boot.devtools.RemoteSpringApplication```。应用程序唯一需要的参数是它所连接的远程URL。
+
+如果你使用**Eclipse**或者**STS**，你有一个名为```my-app```的项目已经部署到Cloud Foundry云平台上，你还需要做下列事情：
+- 菜单[**Run**]-->[**Run Configurations…**] <br/>
+- 创建一个新的Java程序启动配置 <br/>
+- 浏览```my-app```项目 <br/>
+- 使用```org.springframework.boot.devtools.RemoteSpringApplication```作为main class <br/>
+- 添加```https://myapp.cfapps.io```（你的远程URL）到```Program arguments```
+ 
+因为远程客户端应用程序与云平台的应用程序使用相同的==classpath==，所以云平台的应用程序可以直接读取远程客户端应用程序的属性。（官方文档中的real project和it让我有点迷糊，网上的大多是机器翻译，正所谓理论来自于实践，我就去试了一下，得到了这段翻译）<br/>
+这就是```spring.devtools.remote.secret```属性被读取并传到服务器端进行身份验证的方法。
+
+通常建议使用```https://```作为连接协议，因为通信是加密的，密码不能被截获。
+
+如果需要使用代理访问远程应用程序，配置```spring.devtools.remote.proxy.host```和```spring.devtools.remote.proxy.port```属性。
+
+### 10.5.2 远程更新
+远程客户端监视应用程序==classpath==中的更改，与监视[本地重启](#10.2_自动重启)的方式相同。<br/>
+任何更新的资源都被推送到远程应用程序，并（如果需要）触发远程应用程序重新启动。<br/>
+如果你在本地没有云服务的特性上进行迭代，这可能会很有帮助。通常，远程更新和重新启动比完整的重新构建和部署周期要快得多。
+
+只有在远程客户端运行时才监控文件。如果在启动远程客户端之前更改文件，则不会将其推到远程服务器。
+
+### 10.5.3 配置文件系统监视器
+[FileSystemWatcher](https://github.com/spring-projects/spring-boot/tree/v2.2.2.RELEASE/spring-boot-project/spring-boot-devtools/src/main/java/org/springframework/boot/devtools/filewatch/FileSystemWatcher.java)的工作方式是，在一定的时间间隔内轮询类更改，然后等待预定义的静默期，以确保不再发生更改。<br/>
+然后将更改上传到远程应用程序。在较慢的开发环境中，可能会发生这样的情况:安静期不够长，类中的更改可能被分成批。<br/>
+上传第一批类更改后，服务器将重新启动。下一批数据不能发送到应用程序，因为服务器正在重新启动。<br/>
+
+这通常表现在```RemoteSpringApplication```日志中关于上传一些类失败的警告，以及随后的重试。但它也可能导致应用程序代码不一致，并且在上传第一批更改后无法重新启动。
+
+如果你经常观察这些问题，尝试将```spring.devtools.restart.poll-interval```和```spring.devtools.restart.quiet-period```参数的值增加到适合您的开发环境中：
+
+```properties
+spring.devtools.restart.poll-interval=2s
+spring.devtools.restart.quiet-period=1s
+```
+被监视的classpath文件夹现在每2秒轮询一次，以查找更改，并保持1秒的静默期，以确保没有其他类更改。
+
+# 11. 打包您的应用程序用于生产
+可执行jar可用于生产部署。由于它们是自包含的，所以也非常适合基于云的部署。
+
+对于其他“生产就绪”特性，如health、auditing和metric REST或JMX结点，可以考虑添加```spring-boot-actuator```。有关详细信息，请参阅[production-ready-features.html](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/production-ready-features.html#production-ready)。
+
+
+
+
+
+
+
+
 
 
 
