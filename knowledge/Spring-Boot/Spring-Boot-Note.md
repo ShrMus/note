@@ -578,9 +578,12 @@ spring.devtools.restart.trigger-file=.reloadtrigger
 
 如果您处理的是一个多模块项目，然而并不是每个模块都要导入到IDE中，那么您可能需要自定义一些东西。你可以创建一个```META-INF/spring-devtools.properties```文件。<br/>
 
+> The ```spring-devtools.properties``` file can contain properties prefixed with ```restart.exclude``` and ```restart.include```. The ```include``` elements are items that should be pulled up into the “restart” classloader, and the ```exclude``` elements are items that should be pushed down into the “base” classloader. 
+
 这个```spring-devtools.properties```文件可以包含```restart.exclude```和```restart.include```前缀。
 <br/>```include```是一个数组，数组中的元素被“restart”类加载器加载。
 <br/>```exclude```也是一个数组，数组中的元素被“base”类加载器加载。<br/>
+（原文中的==pulled up==和==pushed down==一直没能理解是什么意思，经过讨论后，只有关注```include```和```exclude```中的元素被谁来执行，而没有去特意解释这两个短语的意思）<br/>
 数组元素的值是一个被应用到==classpath==中的正则表达式，如下所示：
 ```properties
 restart.exclude.companycommonlibs=/mycorp-common-[\\w\\d-\.]+\.jar
@@ -661,7 +664,9 @@ Spring Boot developer tools并不局限于本地开发。在运行远程应用�
 - 浏览```my-app```项目 <br/>
 - 使用```org.springframework.boot.devtools.RemoteSpringApplication```作为main class <br/>
 - 添加```https://myapp.cfapps.io```（你的远程URL）到```Program arguments```
- 
+
+> Because the remote client is using the same classpath as the real application it can directly read application properties. 
+
 因为远程客户端应用程序与云平台的应用程序使用相同的==classpath==，所以云平台的应用程序可以直接读取远程客户端应用程序的属性。（官方文档中的real project和it让我有点迷糊，网上的大多是机器翻译，正所谓理论来自于实践，我就去试了一下，得到了这段翻译）<br/>
 这就是```spring.devtools.remote.secret```属性被读取并传到服务器端进行身份验证的方法。
 
