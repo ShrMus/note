@@ -61,12 +61,65 @@ Spring Boot提供了很多```FailureAnalyzers ```实现，你也可以[创建自
 java -jar myproject-0.0.1-SNAPSHOT.jar --debug
 ```
 
-## 1.2 懒加载
+## 1.2 延迟初始化
+开启延迟初始化可以减少应用程序所需的世界，在web应用程序中，启用延迟初始化将导致在接收到HTTP请求之前许多与web相关的bean不会被初始化。
 
+延迟初始化的缺点是较晚得发现应用程序中的问题。如果一个错误配置的bean是延迟初始化的，在启动期间不会出现故障，故障会发生bean被初始化的时候。
 
+还必须注意确保JVM有足够的内存来容纳应用程序的所有bean，而不仅仅是只容纳那些在启动期间初始化的bean。
 
+由于这些原因，延迟初始化默认是禁用的，建议在开启延迟初始化之前对JVM的堆大小进行微调（fine-tuning）。
+
+**用编程方式开启延迟初始化：**<br/>
+使用```SpringApplicationBuilder```的```lazyInitialization```方法：
+
+```java
+SpringApplicationBuilder springApplicationBuilder = new SpringApplicationBuilder();
+springApplicationBuilder.lazyInitialization(true);
+```
+
+使用```SpringApplication```的```setLazyInitialization```方法：
+
+```java
+SpringApplication springApplication = new SpringApplication(Application20200106.class);
+springApplication.setLazyInitialization(true);
+```
+
+**配置文件开启延迟从初始化：**<br/>
+使用```spring.main.lazy-initialization```属性：
+
+```properties
+spring.main.lazy-initialization=true
+```
+
+如果你希望一部分bean使用延迟初始化，一部分bean禁用延迟初始化，你可以使用```@Lazy(false)```注解。
+- lazy = true，表示延迟，默认为true
+- lazy = false，表示不延迟
 
 ## 1.3 自定义Banner
+在==classpath==中添加一个```banner.txt```文件或者设置```spring.banner.location```属性来改变在启动期间打印的banner。<br/>
+如果文件编码不是UTF-8，需要设置```spring.banner.charset```。<br/>
+除了文本文件，还可以在==classpath==中添加```banner.gif```，```banner.jpg```，```banner.png```图片文件。或者设置```spring.banner.image.location```属性。<br/>
+图片被转换成ASCII码打印在任何文本banner上方。
+
+在```banner.txt```文件中，可以使用下列占位符：
+
+变量 | 说明
+---|---
+```${application.version}``` | 应用程序的版本号，和```MANIFEST.MF```一样的声明。例如，```Implementation-Version: 1.0```打印成```1.0```。
+```${application.formatted-version}``` | 应用程序的版本号，和```MANIFEST.MF```一样，按照格式显示（用圆括号括起来并且加上前缀```v```）。如```(v1.0)```。
+```${spring-boot.version}``` | 你在使用的Spring Boot版本，如```2.2.2.RELEASE```。
+```${spring-boot.formatted-version}``` | 你在使用的Spring Boot版本，按照格式显示（用圆括号括起来并且加上前缀```v```）。如```v2.2.2.RELEASE```。
+```${Ansi.NAME} (or ${AnsiColor.NAME}, ${AnsiBackground.NAME}, ${AnsiStyle.NAME})``` | ```NAME```是ANSI转义码的名称，详情参见[```AnsiPropertySource ```](https://github.com/spring-projects/spring-boot/tree/v2.2.2.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/ansi/AnsiPropertySource.java)
+```${application.title}``` | 应用程序的Title，和```MANIFEST.MF```一样。如```Implementation-Title: MyApp```打印成```MyApp```。
+
+如果你想用编程的方式生成一个banner，可以使用```SpringApplication.setBanner(…)```。<br/>
+实现```org.springframework.boot.Banner```接口并重写```printBanner()```方法。
+
+你也可以使用```spring.main.banner-mode```属性控制banner是否在```System.out```(```console```)被打印，或者发送到已配置的日志程序，或者关闭。
+
+打印banner的bean被注册成一个单例bean，名字为：```springBootBanner```。
+
 
 <span id="2._外部化配置"></span>
 # 2. 外部化配置
