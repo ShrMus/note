@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="58d5cd76-3519-4309-8088-890ba3151d27" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/user/IUserService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/user/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/user/UserController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/user/UserRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/user/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/Application20200106.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/Application20200106.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -30,7 +23,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/Application20200106.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="291">
-              <caret line="25" column="8" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
+              <caret line="25" selection-start-line="25" selection-end-line="25" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -250,6 +243,11 @@
             <path>
               <item name="demo20200106-springboot" type="b2602c69:ProjectViewProjectNode" />
               <item name="demo20200106-springboot" type="462c0819:PsiDirectoryNode" />
+              <item name=".idea" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="demo20200106-springboot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="demo20200106-springboot" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -437,18 +435,17 @@
       <workItem from="1578369750776" duration="2195000" />
       <workItem from="1578645177151" duration="861000" />
       <workItem from="1578730106639" duration="8629000" />
-      <workItem from="1578794730016" duration="4870000" />
+      <workItem from="1578794730016" duration="5709000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="21044000" />
+    <option name="totallyTimeSpent" value="21883000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="140" y="72" width="1765" height="954" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2680352" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2680352" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -458,7 +455,7 @@
       <window_info id="Web" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.4390244" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.31585366" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.21097562" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.37058824" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -473,8 +470,8 @@
       <window_info anchor="bottom" id="Version Control" order="14" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" visible="true" weight="0.076832846" />
-      <window_info anchor="right" id="Maven" order="3" weight="0.17577197" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.17653958" />
+      <window_info anchor="right" id="Maven" order="3" visible="true" weight="0.17536657" />
       <window_info anchor="right" id="Palette" order="4" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
       <window_info anchor="right" id="Database" order="6" />
@@ -820,10 +817,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/uiDesigner.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1050">
+          <caret line="6" column="13" lean-forward="true" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/cn/shrmus/springboot/demo20200106/Application20200106.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
-          <caret line="25" column="8" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
