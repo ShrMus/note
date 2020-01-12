@@ -110,15 +110,105 @@ spring.main.lazy-initialization=true
 ```${application.formatted-version}``` | 应用程序的版本号，和```MANIFEST.MF```一样，按照格式显示（用圆括号括起来并且加上前缀```v```）。如```(v1.0)```。
 ```${spring-boot.version}``` | 你在使用的Spring Boot版本，如```2.2.2.RELEASE```。
 ```${spring-boot.formatted-version}``` | 你在使用的Spring Boot版本，按照格式显示（用圆括号括起来并且加上前缀```v```）。如```v2.2.2.RELEASE```。
-```${Ansi.NAME} (or ${AnsiColor.NAME}, ${AnsiBackground.NAME}, ${AnsiStyle.NAME})``` | ```NAME```是ANSI转义码的名称，详情参见[```AnsiPropertySource ```](https://github.com/spring-projects/spring-boot/tree/v2.2.2.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/ansi/AnsiPropertySource.java)
+```${Ansi.NAME} (or ${AnsiColor.NAME}, ${AnsiBackground.NAME}, ${AnsiStyle.NAME})``` | ```NAME```是ANSI转义码的名称，详情参见[```AnsiPropertySource ```](https://github.com/spring-projects/spring-boot/tree/v2.2.2.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/ansi/AnsiPropertySource.java)。
 ```${application.title}``` | 应用程序的Title，和```MANIFEST.MF```一样。如```Implementation-Title: MyApp```打印成```MyApp```。
 
 如果你想用编程的方式生成一个banner，可以使用```SpringApplication.setBanner(…)```。<br/>
 实现```org.springframework.boot.Banner```接口并重写```printBanner()```方法。
 
+> You can also use the spring.main.banner-mode property to determine if the banner has to be printed on System.out (console), sent to the configured logger (log), or not produced at all (off).
+
 你也可以使用```spring.main.banner-mode```属性控制banner是否在```System.out```(```console```)被打印，或者发送到已配置的日志程序，或者关闭。
 
 打印banner的bean被注册成一个单例bean，名字为：```springBootBanner```。
+
+## 1.4 自定义SpringApplication
+如果默认的```SpringApplication```不是你的菜，你可以创建一个本地实例并对其设置。例如，关闭banner：
+```java
+public static void main(String[] args) {
+    SpringApplication springApplication = new SpringApplication(Application20200106.class);
+    springApplication.setBannerMode(Banner.Mode.OFF);
+    springApplication.run(args);
+}
+```
+
+传给```SpringApplication```的构造方法参数是Spring beans的配置源。在大多数情况下，都是引用```@Configuration```类，但是也可以引用XML配置或引用被扫描的包。
+
+**引用XML配置：**
+```java
+ResourceLoader resourceLoader = new ClassPathXmlApplicationContext("config/spring/user/applicationContext-user.xml");
+SpringApplication springApplication = new SpringApplication(resourceLoader,Application20200106.class);
+```
+
+**引用被扫描的包：**
+
+配置类```UserConfiguration```：
+
+```java
+package cn.shrmus.springboot.demo20200106.configuration;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@ComponentScan("cn.shrmus.springboot.demo20200106.user")
+@Configuration
+public class UserConfiguration {
+}
+```
+
+启动类```Application20200106```：
+
+```java
+@Import(value = cn.shrmus.springboot.demo20200106.configuration.UserConfiguration.class)
+@SpringBootApplication
+public class Application20200106 extends SpringApplication{
+    public static void main(String[] args) {
+        ResourceLoader resourceLoader = new AnnotationConfigApplicationContext("cn.shrmus.springboot.demo20200106.user");
+//        ResourceLoader resourceLoader = new AnnotationConfigApplicationContext(cn.shrmus.springboot.demo20200106.configuration.UserConfiguration.class);
+
+        SpringApplication springApplication = new SpringApplication(resourceLoader,Application20200106.class);
+
+        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(args);
+
+        UserController userController = configurableApplicationContext.getBean(UserController.class);
+        System.out.println(userController);
+
+        SpringApplication.exit(configurableApplicationContext);
+    }
+```
+
+
+也可以使用```application.properties```文件配置```SpringApplication```，详情参考[外部化配置](#2._外部化配置)。
+
+要查看```SpringApplication```的完整配置，参考[```SpringApplication``` Javadoc](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/api//org/springframework/boot/SpringApplication.html)。
+
+## 1.5 构建流式API
+如果需要构建一个```ApplicationCOntext```层次结构（具有父/子关系的多个上下文），或者你更喜欢使用构建“流式”API，你可以使用```SpringApplicationBuilder```。
+
+> The ```SpringApplicationBuilder``` lets you chain together multiple method calls and includes ```parent``` and ```child``` methods that let you create a hierarchy, as shown in the following example:
+
+使用```SpringApplicationBuilder```将包含```parent```和```child```方法等多个方法的调用都链在一起，以此创建一个层次结构，如下：
+
+```java
+new SpringApplicationBuilder()
+        .sources(Parent.class)
+        .child(Application.class)
+        .bannerMode(Banner.Mode.OFF)
+        .run(args);
+```
+
+创建```ApplicationContext```层次结构会有一些限制，Web组件被包含在子上下文中，父上下文和子上下文都使用同一个```Environment```。阅读[```SpringApplicationBuilder``` Javadoc](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/api//org/springframework/boot/builder/SpringApplicationBuilder.html)查看详情。
+
+## 1.6 Application事件和监听器
+除了常见的Spring框架事件（如[```ContextRefreshedEvent```](https://docs.spring.io/spring/docs/5.2.2.RELEASE/javadoc-api/org/springframework/context/event/ContextRefreshedEvent.html)）外，```SpringApplication```还发送一些额外的应用程序事件。
+
+
+
+
+
+
+
+
 
 
 <span id="2._外部化配置"></span>
