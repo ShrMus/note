@@ -1,1 +1,2 @@
 #org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.springframework.context.ApplicationListener=cn.shrmus.springboot.demo20200106.listener.MyListener

@@ -202,11 +202,22 @@ new SpringApplicationBuilder()
 ## 1.6 Application事件和监听器
 除了常见的Spring框架事件（如[```ContextRefreshedEvent```](https://docs.spring.io/spring/docs/5.2.2.RELEASE/javadoc-api/org/springframework/context/event/ContextRefreshedEvent.html)）外，```SpringApplication```还发送一些额外的应用程序事件。
 
+有些事件是在创建```ApplicationContext```之前触发的，所以不能将监听器注册成```@Bean```，你可以使用```SpringApplication.addListeners(…)```方法或```SpringApplicationBuilder.listeners(…)```方法注册它们。
 
+如果你希望监听器能自动注册，不管应用程序时如何创建的，你可以在```META-INF/spring.factories```文件中使用```org.springframework.context.ApplicationListener```添加监听器的引用。如下：
 
+```properties
+org.springframework.context.ApplicationListener=cn.shrmus.springboot.demo20200106.listener.MyListener
+```
 
-
-
+在程序运行时，应用程序事件按一下顺序发送：
+1. ```ApplicationStartingEvent```在运行开始但还没有任何处理之前发送，监听器和初始化的注册除外。
+2. ```ApplicationEnvironmentPreparedEvent```在上下文创建之前，```Environment```要在已知的上下文中被使用时发送。
+3. ```ApplicationContextInitializedEvent```在```ApplicationContext```准备好，ApplicationContextInitializers被调用，但还没加载任何bean definitions之前发送。
+4. ```ApplicationPreparedEvent```在bean definitions加载后，启动刷新之前发送。
+5. ```ApplicationStartedEvent```
+6. ```ApplicationReadyEvent```
+7. ```ApplicationFailedEvent```
 
 
 
