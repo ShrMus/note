@@ -212,12 +212,46 @@ org.springframework.context.ApplicationListener=cn.shrmus.springboot.demo2020010
 
 在程序运行时，应用程序事件按一下顺序发送：
 1. ```ApplicationStartingEvent```在运行开始但还没有任何处理之前发送，监听器和初始化的注册除外。
-2. ```ApplicationEnvironmentPreparedEvent```在上下文创建之前，```Environment```要在已知的上下文中被使用时发送。
+2. ```ApplicationEnvironmentPreparedEvent```在```Environment```要在已知的上下文中被使用，但上下文创建之前发送。
 3. ```ApplicationContextInitializedEvent```在```ApplicationContext```准备好，ApplicationContextInitializers被调用，但还没加载任何bean definitions之前发送。
 4. ```ApplicationPreparedEvent```在bean definitions加载后，启动刷新之前发送。
-5. ```ApplicationStartedEvent```
-6. ```ApplicationReadyEvent```
-7. ```ApplicationFailedEvent```
+5. ```ApplicationStartedEvent```在上下文刷新之后，调用应用程序和命令行运行程序之前发送。
+6. ```ApplicationReadyEvent```在应用程序和命令行运行程序被调用后发送。它表明应用程序已经准备好为请求提供服务。
+7. ```ApplicationFailedEvent```在启动出现异常时发送。
+
+上面的列表只包含绑定到```SpringApplication```中的```SpringApplicationEvent```。除此之外，以下事件会在```ApplicationPreparedEvnet```之后和```ApplicationStartedEvent```之前发布：
+
+1. ```ContextRefreshedEvent```在刷新```ApplicationContext```时发送。
+
+> A ```WebServerInitializedEvent``` is sent after the ```WebServer``` is ready.  ```ServletWebServerInitializedEvent``` and ```ReactiveWebServerInitializedEvent``` are the servlet and reactive variants respectively.
+
+2. ```WebServerInitializedEvent```在```WebServer```准备好之后发送。```ServletWebServerInitializedEvent```和```ReactiveWebServerInitializedEvent```分别作用于servlet和reactive。（原文中==variants==原意是变种）
+
+通常不需要使用应用程序事件，但是知道它们的存在是很方便的。在内部，Spring Boot使用事件处理各种任务。
+
+> Application events are sent by using Spring Framework’s event publishing mechanism. Part of this mechanism ensures that an event published to the listeners in a child context is also published to the listeners in any ancestor contexts. As a result of this, if your application uses a hierarchy of ```SpringApplication``` instances, a listener may receive multiple instances of the same type of application event.
+
+应用程序事件是使用Spring框架的事件发布机制发送的。此机制的一部分确保将事件发布到子上下文中的监听器，也能将事件发布到任何祖先上下文的监听器。因此，如果你的应用程序使用了```SpringApplication```实例的层次结构，则监听器可能会接收同一类型应用程序事件的多个实例。
+
+> To allow your listener to distinguish between an event for its context and an event for a descendant context, it should request that its application context is injected and then compare the injected context with the context of the event. The context can be injected by implementing ```ApplicationContextAware``` or, if the listener is a bean, by using ```@Autowired```.
+
+允许监听器区分它的上下文事件和子上下文的事件，它应该请求注入它的应用程序上下文，然后将注入的上下文与事件的上下文比较。上下文可以通过```ApplicationContextAware```实现注入，或者，如果监听器是bean，可以通过```@Autowired```注入。
+
+## 1.7 Web Environment
+
+一个```SpringApplication```会替你创建正确类型的```ApplicationContext```。用于确定```WebApplicationType```的算法相当简单：
+- 如果存在Spring MVC，使用```AnnotationConfigServletWebServerApplicationContext```
+- 如果不在存Spring MVC，但是存在Spring WebFlux，使用```AnnotationConfigReactiveWebServerApplicationContext```
+- 否则，使用```AnnotationConfigApplicationContext```
+
+这意味着如果你同一个应用程序中使用Spring MVC和来自于Spring WebFlux的```WebClinet```，那么默认情况下使用Spring MVC。<br/>
+你也可以通过调用```setWebApplicationType(WebApplicationType)```来覆盖它。
+还可以通过调用```setApplicationContextClass(…)```完全控制```ApplicationContext```类型。
+
+在Junit测试中使用```ApplicationContext```时，通常需要调用```setWebApplicationType(WebApplicationType.NONE)```。
+
+## 1.8 访问应用程序参数
+
 
 
 
