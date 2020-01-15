@@ -4,6 +4,7 @@
 > 摘要
 
 # 1.Spring应用程序
+
 The ```SpringApplication``` 类提供了一种方便的方法来引导从```main()```方法启动的Spring应用程序。你可以委托给```SpringApplication.run```方法，如下所示：
 ```java
 public static void main(String[] args) {
@@ -36,6 +37,7 @@ public static void main(String[] args) {
 要在启动期间添加额外的日志记录，您可以在```SpringApplication```的子类中重写```logStartupInfo(boolean)```。
 
 ## 1.1 启动失败
+
 如果您的应用程序启动失败，注册的```FailureAnalyzers ```将有机会提供专用的错误消息和修复问题的具体操作。<br/>
 例如，如果您在端口8080上启动一个web应用程序，并且该端口已经在使用，您应该看到类似于以下消息：
 ```properties
@@ -62,6 +64,7 @@ java -jar myproject-0.0.1-SNAPSHOT.jar --debug
 ```
 
 ## 1.2 延迟初始化
+
 开启延迟初始化可以减少应用程序所需的世界，在web应用程序中，启用延迟初始化将导致在接收到HTTP请求之前许多与web相关的bean不会被初始化。
 
 延迟初始化的缺点是较晚得发现应用程序中的问题。如果一个错误配置的bean是延迟初始化的，在启动期间不会出现故障，故障会发生bean被初始化的时候。
@@ -97,6 +100,7 @@ spring.main.lazy-initialization=true
 - lazy = false，表示不延迟
 
 ## 1.3 自定义Banner
+
 在==classpath==中添加一个```banner.txt```文件或者设置```spring.banner.location```属性来改变在启动期间打印的banner。<br/>
 如果文件编码不是UTF-8，需要设置```spring.banner.charset```。<br/>
 除了文本文件，还可以在==classpath==中添加```banner.gif```，```banner.jpg```，```banner.png```图片文件。或者设置```spring.banner.image.location```属性。<br/>
@@ -123,6 +127,7 @@ spring.main.lazy-initialization=true
 打印banner的bean被注册成一个单例bean，名字为：```springBootBanner```。
 
 ## 1.4 自定义SpringApplication
+
 如果默认的```SpringApplication```不是你的菜，你可以创建一个本地实例并对其设置。例如，关闭banner：
 ```java
 public static void main(String[] args) {
@@ -183,6 +188,7 @@ public class Application20200106{
 要查看```SpringApplication```的完整配置，参考[```SpringApplication``` Javadoc](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/api//org/springframework/boot/SpringApplication.html)。
 
 ## 1.5 构建流式API
+
 如果需要构建一个```ApplicationCOntext```层次结构（具有父/子关系的多个上下文），或者你更喜欢使用构建“流式”API，你可以使用```SpringApplicationBuilder```。
 
 > The ```SpringApplicationBuilder``` lets you chain together multiple method calls and includes ```parent``` and ```child``` methods that let you create a hierarchy, as shown in the following example:
@@ -200,6 +206,7 @@ new SpringApplicationBuilder()
 创建```ApplicationContext```层次结构会有一些限制，Web组件被包含在子上下文中，父上下文和子上下文都使用同一个```Environment```。阅读[```SpringApplicationBuilder``` Javadoc](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/api//org/springframework/boot/builder/SpringApplicationBuilder.html)查看详情。
 
 ## 1.6 Application事件和监听器
+
 除了常见的Spring框架事件（如[```ContextRefreshedEvent```](https://docs.spring.io/spring/docs/5.2.2.RELEASE/javadoc-api/org/springframework/context/event/ContextRefreshedEvent.html)）外，```SpringApplication```还发送一些额外的应用程序事件。
 
 有些事件是在创建```ApplicationContext```之前触发的，所以不能将监听器注册成```@Bean```，你可以使用```SpringApplication.addListeners(…)```方法或```SpringApplicationBuilder.listeners(…)```方法注册它们。
@@ -251,6 +258,7 @@ org.springframework.context.ApplicationListener=cn.shrmus.springboot.demo2020010
 在Junit测试中使用```ApplicationContext```时，通常需要调用```setWebApplicationType(WebApplicationType.NONE)```。
 
 ## 1.8 访问应用程序参数
+
 如果你需要访问传递给```SpringApplication.run(…)```的应用程序参数，则需要注入```org.springframework.boot.ApplicationArguments```。
 
 > The ```ApplicationArguments``` interface provides access to both the raw ```String[]``` arguments as well as parsed ```option``` and ```non-option``` arguments.
@@ -276,6 +284,7 @@ public class MyBean {
 Spring Boot还可以向Spring ```Environment```注册一个```CommandLinePropertySource```。还可以使用```@Value```注解注入单个应用程序参数。
 
 ## 1.9 使用ApplicationRunner或CommandLineRunner
+
 如果你需要在```SpringApplication```启动后运行一些特定的代码，你可以实现```ApplicationRunner```或者```CommandLineRunner```接口。<br/>
 这两个接口以相同的方式工作，并提供一个单一的```run```方法，这个方法在```SpringApplication.run(…)```结束之前被调用。
 
@@ -295,6 +304,7 @@ public class MyBean implements CommandLineRunner {
 如果定义了多个```CommandLineRunner```或```ApplicationRunner```bean，必须按特定的顺序调用它们。可以通过实现```org.springframework.core.Ordered```接口或```org.springframework.core.annotation.Order```注解控制调用顺序。
 
 ## 1.10 应用程序退出
+
 每个```SpringApplication```向JVM注册一个shotdown hook确保```ApplicationContext```在退出时能够优雅地关闭。所有标准的Spring生命周期回调（例如```DisposableBean```接口或```@PreDestroy```注解）都会被使用。
 
 另外，如果希望```SpringApplication.exit()```被调用时返回特殊的退出码，可以实现```org.springframework.boot.ExitCodeGenerator```接口。这个退出码会被传递给```System.exit()```作为状态码返回。如下：
@@ -327,13 +337,140 @@ public class CustomizingException extends Exception implements ExitCodeGenerator
 ```
 
 ## 1.11 管理特性
+
 通过指定```spring.application.admin.enabled```属性来为应用程序开启管理相关的特性。这将在```MBeanServer```平台上公开[```SpringApplicationAdminMXBean```](https://github.com/spring-projects/spring-boot/tree/v2.2.2.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/admin/SpringApplicationAdminMXBean.java)。你可以使用这个特性来管理你的Spring Boot远程应用程序。这个特性对于任何服务包装器实现都是有用的。
 
 如果你想知道应用程序在哪个HTTP端口上运行，获取```local.server.port```属性的值。
 
-
-
 <span id="2._外部化配置"></span>
 # 2. 外部化配置
+
+Spring Boot允许您将配置外部化，以便可以在不同的环境中使用相同的应用程序代码。你可以使用properties文件，YAML文件，环境变量和命令行参数外部化配置。属性值可以通过使用```@Value```注解直接注入到bean中。通过Spring的```Environment```抽象访问，或通过```@ConfigurationProperties```[绑定到结构化对象](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-typesafe-configuration-properties)。
+
+Spring Boot使用一种非常特殊的```PropertySource```顺序，其设计目的是允许合理地覆盖值。属性按以下顺序排序：
+
+1. [Devtools全局设置属性](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/using-spring-boot.html#using-boot-devtools-globalsettings)在```$HOME/.config/spring-boot```文件夹中的时候devtools是活动状态。
+2. 在你的测试中使用[```@TestPropertySource```](https://docs.spring.io/spring/docs/5.2.2.RELEASE/javadoc-api/org/springframework/test/context/TestPropertySource.html)注解。
+3. 在你的测试中使用```properties```属性。可以在[```@SpringBootTest```](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/api//org/springframework/boot/test/context/SpringBootTest.html)和[用于在你的应用程序中测试特定部分的测试注解](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-testing-spring-boot-applications-testing-autoconfigured-tests)。
+4. 命令行参数。
+5. 来自```SPRING_APPLICATION_JSON```的属性（嵌入在环境变量或系统属性中的内联JSON）。
+6. ```ServletConfig```初始化参数。
+7. ```ServletContext```初始化参数。
+8. 来自```java:comp/env```的JNDI属性。
+9. Java系统属性（```System.getProperties()```）。
+10. 操作系统环境变量。
+11. 只在```random.*```有属性的```RandomValuePropertySource```。
+12. 打包jar之外的[Profile-specific应用程序属性](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-profile-specific-properties)（```application-{profile}.properties```和YAML）。
+13. 打包jar之内的[Profile-specific应用程序属性](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-profile-specific-properties)（```application-{profile}.properties```和YAML）。
+14. 打包jar之外的应用程序属性（```application.properties```和YAML）。
+15. 打包jar之内的应用程序属性（```application.properties```和YAML）。
+16. ```@Configuration```类上的[```@PropertySource```](https://docs.spring.io/spring/docs/5.2.2.RELEASE/javadoc-api/org/springframework/context/annotation/PropertySource.html)注解。请注意，在刷新应用程序上下文之前，不会将此类属性源添加到```Environment```中。在刷新开始之前配置某些属性（例如```logging.*```和```spring.main.*```）已经太晚了。
+17. 默认属性（通过指定设置```SpringApplication.setDefaultProperties```）。
+
+举一个具体的例子，假设你开发的一个```@Component```类使用```name```属性，如下：
+
+```java
+import org.springframework.stereotype.*;
+import org.springframework.beans.factory.annotation.*;
+
+@Component
+public class MyBean {
+
+    @Value("${name}")
+    private String name;
+
+    // ...
+
+}
+```
+
+在你的应用程序==classpath==（jar内）中的```application.properties```文件为```name```提供一个合理的默认属性值。在新environment中运行时，可以在jar之外提供一个```application.properties```文件覆盖```name```。对于一次性测试，可以使用特定的命令行开关启动（```java -jar app.jar --name="Spring"```）。
+
+在带有环境变量的命令行上提供```SPRING_APPLICATION_JSON```属性，使用下面的UNIX shell：
+
+```shell
+$ SPRING_APPLICATION_JSON='{"acme":{"name":"test"}}' java -jar myapp.jar
+```
+
+在前面的例子中，在Spring ```Environment```以```acme.name=test```结束。你还可以在系统属性中用```spring.application.json```提供JSON。如下：
+
+```shell
+$ java -Dspring.application.json='{"name":"test"}' -jar myapp.jar
+```
+
+还可以使用命令行参数提供JSON，如下：
+
+```shell
+$ java -jar myapp.jar --spring.application.json='{"name":"test"}'
+```
+
+还可以使用JNDI变量提供JSON，如下：
+
+```
+java:comp/env/spring.application.json
+```
+
+## 2.1 配置随机值
+
+用于注入随机值的```RandomValuePropertySource```是非常有用的（作为秘钥或测试用例）。它可以生成integers，longs，uuids，strings。如下：
+
+```properties
+my.secret=${random.value}
+my.number=${random.int}
+my.bignumber=${random.long}
+my.uuid=${random.uuid}
+my.number.less.than.ten=${random.int(10)}
+my.number.in.range=${random.int[1024,65536]}
+```
+
+语法：```random.int*```的语法是```OPEN value (,max) CLOSE```，其中```OPEN,CLOSE```是任意字符，```value,max```是整数。如果提供```max```，则```value```为最小值，```max```为最大值（不含）。
+
+## 2.2 访问命令行属性
+
+默认情况下，```SpringApplication```将任何命令行选项参数（参数以```--```开头，如```--server.port=9000```）转换为```property```，并将它们添加到Spring ```Environment```中。
+
+> As mentioned previously, command line properties always take precedence over other property sources.
+
+就如前面所说，命令行属性始终优先于其它属性源。
+
+如果不希望将命令行属性添加到```Environment```中，可以使用```SpringApplication.setAddCommandLineProperties(false)```来禁用。
+
 ## 2.3 应用程序属性文件
-==application.properties==文件的加载顺序
+
+加载配置文件：```SpringApplication```从以下位置的```application.properties```文件中加载属性并将属性添加到Spring ```Environment```中：
+1. 当前目录的```/config```子目录
+2. 当前目录
+3. ==classpath==下的```/config```包
+4. ==classpath==的根目录
+
+列表按优先级排序（在列表中较高位置定义的属性覆盖在较低位置定义的属性）。
+
+你也可以[使用YAML('yml')文件](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-yaml)替代'.properties'。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
