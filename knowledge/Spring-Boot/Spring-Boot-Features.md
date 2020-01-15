@@ -161,7 +161,7 @@ public class UserConfiguration {
 ```java
 @Import(value = cn.shrmus.springboot.demo20200106.configuration.UserConfiguration.class)
 @SpringBootApplication
-public class Application20200106 extends SpringApplication{
+public class Application20200106{
     public static void main(String[] args) {
         ResourceLoader resourceLoader = new AnnotationConfigApplicationContext("cn.shrmus.springboot.demo20200106.user");
 //        ResourceLoader resourceLoader = new AnnotationConfigApplicationContext(cn.shrmus.springboot.demo20200106.configuration.UserConfiguration.class);
@@ -251,9 +251,48 @@ org.springframework.context.ApplicationListener=cn.shrmus.springboot.demo2020010
 在Junit测试中使用```ApplicationContext```时，通常需要调用```setWebApplicationType(WebApplicationType.NONE)```。
 
 ## 1.8 访问应用程序参数
+如果你需要访问传递给```SpringApplication.run(…)```的应用程序参数，则需要注入```org.springframework.boot.ApplicationArguments```。
 
+> The ```ApplicationArguments``` interface provides access to both the raw ```String[]``` arguments as well as parsed ```option``` and ```non-option``` arguments.
 
+接口```ApplicationArguments```提供对原始```String[]```参数和解析过的```option```和```non-option```参数的访问。如下：
 
+```java
+import org.springframework.boot.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
+
+@Component
+public class MyBean {
+    @Autowired
+    public MyBean(ApplicationArguments args) {
+        boolean debug = args.containsOption("debug");
+        List<String> files = args.getNonOptionArgs();
+        // if run with "--debug logfile.txt" debug=true, files=["logfile.txt"]
+    }
+}
+```
+
+Spring Boot还可以向Spring ```Environment```注册一个```CommandLinePropertySource```。还可以使用```@Value```注解注入单个应用程序参数。
+
+## 1.9 使用ApplicationRunner或CommandLineRunner
+如果你需要在```SpringApplication```启动后运行一些特定的代码，你可以实现```ApplicationRunner```或者```CommandLineRunner```接口。<br/>
+这两个接口以相同的方式工作，并提供一个单一的```run```方法，这个方法在```SpringApplication.run(…)```结束之前被调用。
+
+接口```CommandLineRunner```以简单字符串数组的形式提供对应用程序参数的访问，而```ApplicationRunner```使用谈论过的```ApplicationArguments```。下面的例子展示带```run```方法的```CommandLineRunner```：
+```java
+import org.springframework.boot.*;
+import org.springframework.stereotype.*;
+
+@Component
+public class MyBean implements CommandLineRunner {
+    public void run(String... args) {
+        // Do something...
+    }
+}
+```
+
+如果定义了多个```CommandLineRunner```或```ApplicationRunner```bean，必须按特定的顺序调用它们。可以通过实现```org.springframework.core.Ordered```接口或```org.springframework.core.annotation.Order```注解控制调用顺序。
 
 
 <span id="2._外部化配置"></span>

@@ -1,28 +1,27 @@
 package cn.shrmus.springboot.demo20200106;
 
-import cn.shrmus.springboot.demo20200106.user.UserController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ResourceLoader;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.List;
 
-@Import(value = cn.shrmus.springboot.demo20200106.configuration.UserConfiguration.class)
+//@Import(value = cn.shrmus.springboot.demo20200106.configuration.UserConfiguration.class)
 @SpringBootApplication
-public class Application20200106 extends SpringApplication{
+public class Application20200106 {
     public static void main(String[] args) {
 //        ResourceLoader resourceLoader = new ClassPathXmlApplicationContext("config/spring/user/applicationContext-user.xml");
 
-        ResourceLoader resourceLoader = new AnnotationConfigApplicationContext("cn.shrmus.springboot.demo20200106.user");
+//        ResourceLoader resourceLoader = new AnnotationConfigApplicationContext("cn.shrmus.springboot.demo20200106.user");
 //        ResourceLoader resourceLoader = new AnnotationConfigApplicationContext(cn.shrmus.springboot.demo20200106.configuration.UserConfiguration.class);
 
-        SpringApplication springApplication = new SpringApplication(resourceLoader, Application20200106.class);
-//        SpringApplication springApplication = new SpringApplication(Application20200106.class);
+//        SpringApplication springApplication = new SpringApplication(resourceLoader, Application20200106.class);
+        SpringApplication springApplication = new SpringApplication(Application20200106.class);
 
         springApplication.setBannerMode(Banner.Mode.OFF);
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(args);
@@ -55,11 +54,20 @@ public class Application20200106 extends SpringApplication{
         System.out.println("===============================> Application20200106()");
     }
 
-    @Override
-    protected void logStartupInfo(boolean isRoot) {
-        System.out.println("===============================> logStartupInfo(boolean isRoot)");
-        super.logStartupInfo(isRoot);
+    @Autowired
+    public Application20200106(ApplicationArguments applicationArguments) {
+        boolean debug = applicationArguments.containsOption("debug");
+        System.out.println("===============> debug = " + debug);
+
+        List<String> files = applicationArguments.getNonOptionArgs();
+        System.out.println("===============> Application20200106(ApplicationArguments applicationArguments) = " + files);
     }
+
+//    @Override
+//    protected void logStartupInfo(boolean isRoot) {
+//        System.out.println("===============================> logStartupInfo(boolean isRoot)");
+//        super.logStartupInfo(isRoot);
+//    }
 
     @PostConstruct
     public void testPostConstruct() {
