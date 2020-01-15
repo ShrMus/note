@@ -3,9 +3,11 @@ package cn.shrmus.springboot.demo20200106;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.Banner;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -47,7 +49,7 @@ public class Application20200106 {
 //        Arrays.sort(beanDefinitionNames);
 //        Arrays.stream(beanDefinitionNames).forEach(System.out::println);
 
-        SpringApplication.exit(configurableApplicationContext);
+        System.exit(SpringApplication.exit(configurableApplicationContext));
     }
 
     public Application20200106() {
@@ -79,4 +81,12 @@ public class Application20200106 {
         System.out.println("============================> testPreDestroy()");
     }
 
+//    @Override
+//    public int getExitCode() {
+//        return 43;
+//    }
+    @Bean
+    public ExitCodeGenerator exitCodeGenerator() {
+        return () -> 42;
+    }
 }

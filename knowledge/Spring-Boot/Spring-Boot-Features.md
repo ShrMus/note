@@ -294,6 +294,44 @@ public class MyBean implements CommandLineRunner {
 
 如果定义了多个```CommandLineRunner```或```ApplicationRunner```bean，必须按特定的顺序调用它们。可以通过实现```org.springframework.core.Ordered```接口或```org.springframework.core.annotation.Order```注解控制调用顺序。
 
+## 1.10 应用程序退出
+每个```SpringApplication```向JVM注册一个shotdown hook确保```ApplicationContext```在退出时能够优雅地关闭。所有标准的Spring生命周期回调（例如```DisposableBean```接口或```@PreDestroy```注解）都会被使用。
+
+另外，如果希望```SpringApplication.exit()```被调用时返回特殊的退出码，可以实现```org.springframework.boot.ExitCodeGenerator```接口。这个退出码会被传递给```System.exit()```作为状态码返回。如下：
+
+```java
+@SpringBootApplication
+public class ExitCodeApplication {
+    @Bean
+    public ExitCodeGenerator exitCodeGenerator() {
+        return () -> 42;
+    }
+
+    public static void main(String[] args) {
+        System.exit(SpringApplication.exit(SpringApplication.run(ExitCodeApplication.class, args)));
+    }
+}
+```
+
+此外，接口```ExitCodeGenerator```可以由异常实现。当遇到这样的异常，Spring Boot将返回退出码，退出码是实现这个接口时重写```getExitCode()```方法提供的退出码。
+
+```java
+import org.springframework.boot.ExitCodeGenerator;
+
+public class CustomizingException extends Exception implements ExitCodeGenerator {
+    @Override
+    public int getExitCode() {
+        return 43;
+    }
+}
+```
+
+## 1.11 管理特性
+通过指定```spring.application.admin.enabled```属性来为应用程序开启管理相关的特性。这将在```MBeanServer```平台上公开[```SpringApplicationAdminMXBean```](https://github.com/spring-projects/spring-boot/tree/v2.2.2.RELEASE/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/admin/SpringApplicationAdminMXBean.java)。你可以使用这个特性来管理你的Spring Boot远程应用程序。这个特性对于任何服务包装器实现都是有用的。
+
+如果你想知道应用程序在哪个HTTP端口上运行，获取```local.server.port```属性的值。
+
+
 
 <span id="2._外部化配置"></span>
 # 2. 外部化配置
