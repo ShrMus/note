@@ -447,11 +447,23 @@ my.number.in.range=${random.int[1024,65536]}
 
 你也可以[使用YAML('yml')文件](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-yaml)替代'.properties'。
 
+如果不想用```application.properties```作为配置文件名，你也可以指定```spring.config.name```环境属性来切换到另一个文件名。还可以使用```spring.config.location```环境属性来引用一个显示的位置（以逗号分隔的目录位置或文件路径）。
 
+通过```spring.config.name```指定一个文件名：
 
+```shell
+$ java -jar myproject.jar --spring.config.name=myproject
+```
 
+通过```spring.config.location```指定文件位置：
 
+```shell
+$ java -jar myproject.jar --spring.config.location=classpath:/default.properties,classpath:/override.properties
+```
 
+```spring.config.name```和```spring.config.location``` 很早就用于确定必须加载哪些文件。它们必须定义为环境属性（通常是操作系统环境变量，系统属性，命令行参数）。
+
+如果```spring.config.location```包含目录（与文件相反），
 
 
 

@@ -48,7 +48,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- 启动类的全限定名 -->
-                    <mainClass>cn.shrmus.springboot.demo20191222.Application20191222</mainClass>
+                    <mainClass>cn.shrmus.springboot.demo20200106.Application20200106</mainClass>
                     <excludeDevtools>false</excludeDevtools>
                 </configuration>
                 <executions>
