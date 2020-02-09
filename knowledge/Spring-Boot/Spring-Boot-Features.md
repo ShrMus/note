@@ -463,12 +463,35 @@ $ java -jar myproject.jar --spring.config.location=classpath:/default.properties
 
 ```spring.config.name```和```spring.config.location``` 很早就用于确定必须加载哪些文件。它们必须定义为环境属性（通常是操作系统环境变量，系统属性，命令行参数）。
 
-如果```spring.config.location```包含目录（与文件相反），
+如果```spring.config.location```包含目录（与文件相反），它们应该以```/```结尾（在运行时，在加载前附加由```spring.config.name```生成的名称，包含profile-specific文件名）。```spring.config.location```中指定的文件按原样使用，不支持profile-specific变体，并被任何profile-specific属性覆盖。
 
+配置位置以相反的顺序搜索。默认情况下，配置位置是```classpath:/```，```classpath:/config/```，```file:./```，```file:./config/```。搜索结果的顺序如下：
+1. ```file:./config/```
+2. ```file:./```
+3. ```classpath:/config/```
+4. ```classpath:/```
 
+当使用```spring.config.location```自定义配置位置时，它们替代默认的位置。例如，如果```spring.config.location```的值被配置成```classpath:/custom-config/```，```file:./custom-config/```，搜索顺序如下：
+1. ```file:./custom-config/```
+2. ```classpath:custom-config/```
 
+作为选择，当使用```spring.config.additional-location```自定义配置位置时，它们被使用除默认位置外。附加位置在默认位置之前被搜索。例如，如果附加位置```classpath:/custom-config/```，```file:./custom-config/```被配置，搜索顺序如下：
+1. ```file:./custom-config/```
+2. ```classpath:custom-config/```
+3. ```file:./config/```
+4. ```file:./```
+5. ```classpath:/config/```
+6. ```classpath:/```
 
+> This search ordering lets you specify default values in one configuration file and then selectively override those values in another. You can provide default values for your application in ```application.properties``` (or whatever other basename you choose with ```spring.config.name```) in one of the default locations. These default values can then be overridden at runtime with a different file located in one of the custom locations.
 
+这种搜索顺序允许您在一个配置文件中指定默认值，然后有选择地在另一个配置文件中覆盖这些值。你可以在一个默认位置的```application.properties```中为你的应用程序提供默认值（或你选择的任何其他基本的```spring.config.name```）。在运行时使用位于自定义位置中另一个文件覆盖这些默认值。
+
+如果使用环境变量而不是系统属性，大部分操作系统不允许点分隔（period-separated）的键名，但你可以使用下划线（```SPRING_CONFIG_NAME```代替```spring.config.name```）。
+
+如果应用程序在容器中运行，然后可以使用JNDI属性（在```java:comp/env```中）或servlet上下文初始化参数来代替环境变量或系统属性。
+
+## 2.4 Profile-specific属性
 
 
 
