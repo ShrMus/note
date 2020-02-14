@@ -493,8 +493,42 @@ $ java -jar myproject.jar --spring.config.location=classpath:/default.properties
 
 ## 2.4 Profile-specific属性
 
+除```application.properties```文件之外，profile-specific属性也能通过使用```application-{profile}.properties```命名约定被定义。```Environment```有一组默认配置文件（默认情况下，```[default]```），如果没有设置活动配置文件，就使用这些默认配置文件。换句话说，如果没有配置文件被明确激活，那么属性从```application-default.properties```被加载。
 
+Profile-specific属性从与标准```application.properties```相同的位置加载，使用profile-specific文件总是覆盖non-specific文件，不管profile-specific文件位于打包的jar的内部或外部。
 
+> If several profiles are specified, a last-wins strategy applies. For example, profiles specified by the ```spring.profiles.active``` property are added after those configured through the ```SpringApplication``` API and therefore take precedence.
+
+如果多个配置文件被指定，则应用最后配置的策略。例如，```spring.profiles.active```属性指定的配置文件添加在通过```SpringApplication``` API配置之后，因此优先。
+
+假设```application.properties```中有如下配置：
+
+```properties
+spring.profiles.active=pro,dev
+```
+
+最终生效的是```application-dev.properties```文件。
+
+如果你在```spring.config.location```指定了一些文件，profile-specific的变体不被考虑。如果你想使用profile-specific属性，在```spring.config.location```中使用目录。
+
+## 2.5 占位符属性
+
+文件```application.properties```中的值在使用时通过现有的```Environment```过滤，所以你可以返回到以前定义的值（例如，系统属性中定义的值）。
+
+```properties
+app.name=MyApp
+app.description=${app.name} is a Spring Boot application
+```
+
+您还可以使用此技术创建现有Spring Boot属性的“短”变体。点击[howto.html](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/howto.html#howto-use-short-command-line-arguments)查看详情。
+
+## 2.6 加密属性
+
+Spring Boot不提供任何对属性值加密的支持，然而，它提供了修改Spring ```Environment```中包含的值所必须的hook点。```EnvironmentPostProcessor```接口允许你在应用启动之前操作（manipulate）```Environment```。点击[howto.html](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/howto.html#howto-customize-the-environment-or-application-context)查看详情。
+
+如果您正在寻找一种安全的方式来存储凭证和密码，[Spring Cloud Vault](https://cloud.spring.io/spring-cloud-vault/)项目提供了在[HashiCorp Vault](https://www.vaultproject.io/)中存储外部化配置的支持。
+
+## 2.7 使用YAML代替Properties
 
 
 
