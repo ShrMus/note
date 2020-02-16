@@ -530,6 +530,160 @@ Spring Boot不提供任何对属性值加密的支持，然而，它提供了修
 
 ## 2.7 使用YAML代替Properties
 
+YAML是JSON的超集，因此是指定分层配置数据的一种方便的格式。当你的classpath中有SnakeYAML库时，```SpringApplication```类自动支持YAML作为properties的另一种选择。
+
+SnakeYAML是由```spring-boot-starter```自动提供的。
+
+### 2.7.1 加载YAML
+
+Spring框架提供了两个方便的类用于加载YAML文档。```YamlPropertiesFactoryBean```将YAML加载为```Properties```，```YamlMapFactoryBean```将YAML加载为```Map```。
+
+例如：参考以下YAML文档：
+
+```yaml
+environments:
+    dev:
+        url: https://dev.example.com
+        name: Developer Setup
+    prod:
+        url: https://another.example.com
+        name: My Cool App
+```
+
+将上述YAML文档转换为下列properties：
+
+```properties
+environments.dev.url=https://dev.example.com
+environments.dev.name=Developer Setup
+environments.prod.url=https://another.example.com
+environments.prod.name=My Cool App
+```
+
+YAML列表用[```index```]作为引用，代表属性键。如下：
+
+```yaml
+my:
+   servers:
+       - dev.example.com
+       - another.example.com
+```
+
+将上述YAML文档转换为下列properties：
+
+```properties
+my.servers[0]=dev.example.com
+my.servers[1]=another.example.com
+```
+
+通过使用Spring Boot的```Binder```工具（```@ConfigurationProperties```就是这么做的）来绑定这样的属性。如果在目标bean中有```java.util.List```（或者```Set```）类型的属性，你需要提供setter或使用可变值初始化它。下面的例子绑定到上述属性：
+
+```java
+@ConfigurationProperties(prefix="my")
+public class Config {
+
+    private List<String> servers = new ArrayList<String>();
+
+    public List<String> getServers() {
+        return this.servers;
+    }
+}
+```
+
+### 2.7.2 将YAML作为Properties公开在Spring环境
+
+类```YamlPropertySourceLoader```可将YAML作为```PropertySource```公开在Spring环境中。这样就可以使用带有占位符语法的```@Value```注解来访问YAML属性。
+
+### 2.7.3 Multi-profile YAML文档
+
+通过使用```spring.profiles```键，你可以在一个文件中指定多个profile-specific YAML文档，指定文档何时应用，如下：
+
+```yaml
+server:
+    address: 192.168.1.100
+---
+spring:
+    profiles: development
+server:
+    address: 127.0.0.1
+---
+spring:
+    profiles: production & eu-central
+server:
+    address: 192.168.1.120
+```
+
+如果```development```配置文件是激活的，那么```server.address```的属性值为```127.0.0.1```。<br/>
+同理，如果```production```和```eu-central```配置文件是激活的，```server.address```的属性值为```192.168.1.120```。<br/>
+如果```development```，```production```和```eu-central```配置文件都没有启用，那么```server.address```的属性值为```192.168.1.100```。
+
+```spring.profiles```可以包含简单的配置文件名（如```production```）或配置文件表达式。配置文件表达式允许表达更复杂的配置文件逻辑，如```production & (eu-central | eu-west)```。查看[参考指南](https://docs.spring.io/spring/docs/5.2.2.RELEASE/spring-framework-reference/core.html#beans-definition-profiles-java)了解更多详情。
+
+如果在应用程序上下文启动时没有显式激活配置文件，则默认配置文件将被激活。因此，在下列YAML中，我们为```spring.security.user.password```设置了一个仅在默认配置文件中可用的值：
+
+```yaml
+server:
+  port: 8000
+---
+spring:
+  profiles: default
+  security:
+    user:
+      password: weak
+```
+
+然而，在下面的例子中，密码总是被设置，因为它没有附加到任何配置文件中，而且它必须在所有其他配置文件中被显式重置：
+
+```yaml
+server:
+  port: 8000
+spring:
+  security:
+    user:
+      password: weak
+```
+
+> Spring profiles designated by using the ```spring.profiles``` element may optionally be negated by using the ```!``` character. If both negated and non-negated profiles are specified for a single document, at least one non-negated profile must match, and no negated profiles may match.
+
+使用```spring.profiles```元素指定的Spring配置文件通过使用```!```字符选择性地否定。如果为单个文档指定了否定配置文件和非否定配置文件，至少有一个非否定的配置文件必须匹配，并且否定的配置文件不能匹配。
+
+### 2.7.4 YAML的不足
+
+YAML文件不能通过```@PropertySource```注解加载。因此，在需要以这种方式加载值的情况下，需要使用属性文件。
+
+在profile-specific YAML文件中使用multi YAML文档语法可能导致意外发生。如下：
+
+**application-dev.yml**
+
+```yaml
+server:
+  port: 8000
+---
+spring:
+  profiles: "!test"
+  security:
+    user:
+      password: "secret"
+```
+
+如果使用参数```--spring.profiles.active=dev```运行应用程序，你可能希望```security.user.password```设置为```secret```，但是并不会。
+
+嵌套的文档将被过滤，因为主文件名为```application-dev.yml```。它已经被认为是profile-specific，嵌套文档将被忽略。
+
+建议不要将profile-specific YAML文件和多个YAML文档混合使用。只使用其中一个。
+
+## 2.8 类型安全的配置属性
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
