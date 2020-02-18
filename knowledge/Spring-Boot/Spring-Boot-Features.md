@@ -673,20 +673,89 @@ spring:
 
 ## 2.8 类型安全的配置属性
 
+使用```@Value("${property}")```注解注入配置属性有时会很麻烦（cumbersome），特别（especially）是在处理多个属性或数据本质上是分层的情况下。Spring Boot提供了另一种处理属性的方法，允许强类型bean控制和验证应用程序的配置。
 
+请参见[```@Value```和```类型安全配置属性```之间的区别](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-vs-value)。
 
+### 2.8.1 JavaBean属性绑定
 
+可以绑定一个声明标准JavaBean属性的bean，如下面的例子所示：
 
+```java
+package com.example;
 
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
+@ConfigurationProperties("acme")
+public class AcmeProperties {
 
+    private boolean enabled;
 
+    private InetAddress remoteAddress;
 
+    private final Security security = new Security();
 
+    public boolean isEnabled() { ... }
 
+    public void setEnabled(boolean enabled) { ... }
 
+    public InetAddress getRemoteAddress() { ... }
 
+    public void setRemoteAddress(InetAddress remoteAddress) { ... }
+
+    public Security getSecurity() { ... }
+
+    public static class Security {
+
+        private String username;
+
+        private String password;
+
+        private List<String> roles = new ArrayList<>(Collections.singleton("USER"));
+
+        public String getUsername() { ... }
+
+        public void setUsername(String username) { ... }
+
+        public String getPassword() { ... }
+
+        public void setPassword(String password) { ... }
+
+        public List<String> getRoles() { ... }
+
+        public void setRoles(List<String> roles) { ... }
+
+    }
+}
+```
+
+上述POJO定义了下列属性：
+- ```acme.enabled```，默认值为```false```。
+- ```acme.remote-address```，可以强制使用来自```String```的类型。
+- ```acme.security.username```，嵌套的"security"对象，其名称由属性的名称决定。特别是（In particular），返回类型没有被使用，可能是```SecurityProperties```。
+- ```acme.security.password```。
+- ```acme.security.roles```，默认是```USER```的```String```集合。
+
+Spring Boot自动配置大量使用```@ConfigurationProperties```来轻松配置自动配置的bean。<br/>
+类似于自动配置类，在Spring Boot中可用的```@ConfigurationProperties```类仅供内部使用。<br/>
+
+> The properties that map to the class, which are configured via properties files, YAML files, environment variables etc., are public API but the content of the class itself is not meant to be used directly.
+
+映射到类的属性（通过属性文件、YAML文件、环境变量等配置）是公共API，但是类本身的内容并不意味着可以直接（directly）使用。
+
+这种安排依赖于（relies on）默认的空构造函数，getter和setter通常是强制性的（mandatory），因为绑定是通过标准的Java bean属性描述符进行的，就像在Spring MVC中一样。在下列情况下可省略setter：
+- 只要映射被初始化，就需要一个getter，但不一定是setter，因为绑定器可以对它们进行修改。
+- 可以通过索引（通常使用YAML）或使用单个逗号分隔（comma-separated）的值（属性）访问集合和数组。在后一个情况下，setter是必需的。我们建议始终为此类型添加setter。如果你初始化一个集合，请确保它是可变的（not immutable）（如前面的实例所示）。
+- 如果初始化了嵌套的POJO属性(如前面示例中的```Security```字段)，则不需要setter。如果你想用绑定器使用其默认构造方法动态（on the fly）创建一个实例，则需要setter。
+
+有些人使用Lombok自动添加getter和setter。请确保Lombok不会为这样的类型生成任何特定的（particular）构造方法，因为容器会自动使用它来实例化对象。
+
+最后，只有标准Java Bean属性被支持，不支持绑定静态属性。
 
 
 
