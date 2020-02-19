@@ -677,6 +677,7 @@ spring:
 
 请参见[```@Value```和```类型安全配置属性```之间的区别](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-vs-value)。
 
+<span id="2.8.1_JavaBean属性绑定"></span>
 ### 2.8.1 JavaBean属性绑定
 
 可以绑定一个声明标准JavaBean属性的bean，如下面的例子所示：
@@ -756,6 +757,144 @@ Spring Boot自动配置大量使用```@ConfigurationProperties```来轻松配置
 有些人使用Lombok自动添加getter和setter。请确保Lombok不会为这样的类型生成任何特定的（particular）构造方法，因为容器会自动使用它来实例化对象。
 
 最后，只有标准Java Bean属性被支持，不支持绑定静态属性。
+
+### 2.8.2 构造方法绑定
+
+上一节的示例可以在不变的情况下（in an immutable fashion）重写，如下所示：
+
+```java
+package com.example;
+
+import java.net.InetAddress;
+import java.util.List;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.boot.context.properties.DefaultValue;
+
+@ConstructorBinding
+@ConfigurationProperties("acme")
+public class AcmeProperties {
+
+    private final boolean enabled;
+
+    private final InetAddress remoteAddress;
+
+    private final Security security;
+
+    public AcmeProperties(boolean enabled, InetAddress remoteAddress, Security security) {
+        this.enabled = enabled;
+        this.remoteAddress = remoteAddress;
+        this.security = security;
+    }
+
+    public boolean isEnabled() { ... }
+
+    public InetAddress getRemoteAddress() { ... }
+
+    public Security getSecurity() { ... }
+
+    public static class Security {
+
+        private final String username;
+
+        private final String password;
+
+        private final List<String> roles;
+
+        public Security(String username, String password,
+                @DefaultValue("USER") List<String> roles) {
+            this.username = username;
+            this.password = password;
+            this.roles = roles;
+        }
+
+        public String getUsername() { ... }
+
+        public String getPassword() { ... }
+
+        public List<String> getRoles() { ... }
+
+    }
+
+}
+```
+
+在这个设置中，```@ConstructorBinding```注解用于指示（indicate）应该使用构造函数绑定。<br/>
+
+> This means that the binder will expect to find a constructor with the parameters that you wish to have bound.
+
+这意味着绑定器将期望找到带参数的构造方法，而这些参数是已绑定的。
+
+具有```@ConstructorBinding```类的内部类（如上面示例中的```Security```）也将通过其构造函数绑定。
+
+可以使用```@DefaultValue```指定默认值，并用相同的转换服务将```String```值强制（coerce）转换为缺失属性的目标类型。
+
+要使用构造函数绑定，必须使用启动```@EnableConfigurationProperties```或配置属性扫描。由常规Spring机制创建的bean（如```@Component``` bean，通过（via）```@Bean```方法创建的bean，或者通过```@Import```加载的bean）不能使用构造函数绑定。
+
+如果您的类有多个构造方法，您还可以直接在需要绑定的构造方法上使用```@ConstructorBinding```。
+
+### 2.8.3 开启```@ConfigurationProperties```注解类型
+
+Spring Boot提供了绑定```@ConfigurationProperties```类型并将它们注册为bean的基础设施（infrastructure）。你可以逐个类地启用配置属性，或启用与组件扫描工作方式类似的配置属性扫描。
+
+有时候，用```@ConfigurationProperties```注解的类不适合扫描，例如，如果您正在开发自己的自动配置，或者希望有条件地启用它们。在这些情况下，使用```@EnableConfigurationProperties```注解指定要处理的类型列表。这个注解可以用在任何```@Configuration```类上，如下：
+
+```java
+@Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(AcmeProperties.class)
+public class MyConfiguration {
+}
+```
+
+要想使用配置属性扫描，要将```@ConfigurationPropertiesScan```注解添加到你的应用程序中。通常（typically），它被添加到使用```@SpringBootApplication```注解的主应用程序类中，但```@ConfigurationPropertiesScan```注解也可以被添加到任何```@Configuration```类中。默认情况下，将对声明注解的类的包进行扫描。如果你想扫描特定的包，你可以按下面的例子来做：
+
+```java
+@SpringBootApplication
+@ConfigurationPropertiesScan({ "com.example.app", "org.acme.another" })
+public class MyApplication {
+}
+```
+
+当```@ConfigurationProperties``` bean使用配置属性扫描或通过```@EnableConfigurationProperties```注册时，这个bean户有一个按照惯例的（conventional）名称：```<prefix>-<fqn>```，其中```<prefix>```是在```@ConfigurationProperties```注解中指定的环境键前缀，```<fqn>```是bean的全限定名（the fully qualified name of the bean）。如果注解不提供任何前缀，则只使用bean的全限定名。
+
+上述2.8.2的例子中的bean名是```acme-com.example..AcmeProperties```。
+
+建议```@ConfigurationProperties```只处理（deal with）环境，特别（in particular）是不从上下文注入其他bean。对于极端（corner）情况，可以使用setter注入或框架提供的任何```*Aware```接口（例如你要访问```Environment```可以使用```EnvironmentAware```）。如果你仍然要使用构造方法注入其他bean，则必须使用```@Component```注解配置属性bean，并使用[JavaBean属性绑定](#2.8.1_JavaBean属性绑定)。
+
+### 2.8.4 使用```@ConfigurationProperties```注解类型
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
