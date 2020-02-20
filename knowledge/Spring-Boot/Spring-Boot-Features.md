@@ -108,6 +108,8 @@ spring.main.lazy-initialization=true
 
 在```banner.txt```文件中，可以使用下列占位符：
 
+**表1 Banner变量**
+
 变量 | 说明
 ---|---
 ```${application.version}``` | 应用程序的版本号，和```MANIFEST.MF```一样的声明。例如，```Implementation-Version: 1.0```打印成```1.0```。
@@ -863,6 +865,145 @@ public class MyApplication {
 建议```@ConfigurationProperties```只处理（deal with）环境，特别（in particular）是不从上下文注入其他bean。对于极端（corner）情况，可以使用setter注入或框架提供的任何```*Aware```接口（例如你要访问```Environment```可以使用```EnvironmentAware```）。如果你仍然要使用构造方法注入其他bean，则必须使用```@Component```注解配置属性bean，并使用[JavaBean属性绑定](#2.8.1_JavaBean属性绑定)。
 
 ### 2.8.4 使用```@ConfigurationProperties```注解类型
+
+这种配置方式在```SpringApplication```外部的YAML配置中特别好用，如下面的例子所示：
+
+```yaml
+# application.yml
+
+acme:
+    remote-address: 192.168.1.1
+    security:
+        username: admin
+        roles:
+          - USER
+          - ADMIN
+
+# additional configuration as required
+```
+
+要使用```@ConfigurationProperties``` bean，你可以与任何其他bean相同的方式注入它们，如下所示：
+
+```java
+@Service
+public class MyService {
+
+    private final AcmeProperties properties;
+
+    @Autowired
+    public MyService(AcmeProperties properties) {
+        this.properties = properties;
+    }
+
+    //...
+
+    @PostConstruct
+    public void openConnection() {
+        Server server = new Server(this.properties.getRemoteAddress());
+        // ...
+    }
+
+}
+```
+
+> Using @ConfigurationProperties also lets you generate metadata files that can be used by IDEs to offer auto-completion for your own keys. 
+
+使用```@ConfigurationProperties```还可以生成元数据文件，IDE可以使用这些元数据文件为你的键提供自动完成功能。详见[appendix](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/appendix-configuration-metadata.html#configuration-metadata)。
+
+### 2.8.5 第三方配置
+
+除了（as well as）使用```@ConfigurationProperties```注解类外，您还可以在公共```@Bean```方法上使用它。当你想将属性绑定到超出你控制范围外的第三方组件时，这样做特别有用。
+
+从```Environment```属性配置bean，将```@ConfigurationProperties```添加到它的bean registration中，如下所示：
+
+```java
+@ConfigurationProperties(prefix = "another")
+@Bean
+public AnotherComponent anotherComponent() {
+    ...
+}
+```
+
+> Any JavaBean property defined with the ```another``` prefix is mapped onto that ```AnotherComponent``` bean in manner similar to the preceding ```AcmeProperties``` example.
+
+使用```another```前缀定义的任何JavaBean属性都将以类似前面的（preceding）```AcmeProperties```示例的方式映射到```AnotherComponent``` bean。
+
+### 2.8.6 宽松的绑定
+
+Spring Boot使用一些宽松的（relaxed）规则将```Environment```属性绑定到```@ConfigurationProperties``` beans中，因此，```Environment```属性名和bean属性名不需要完全匹配（exact match）。有用的常见示例包括短横线分隔的（dash-speparated）环境属性（如```context-path```绑定到```contextPath```），以及大写的（capitalized）环境属性（如```PORT```绑定到```port```）。如下所示：
+
+```java
+@ConfigurationProperties(prefix="acme.my-project.person")
+public class OwnerProperties {
+
+    private String firstName;
+
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+}
+```
+
+使用上述代码，可以使用以下属性名：
+
+**表2 宽松的绑定**
+
+属性 | 描述
+---|---
+```acme.my-project.person.first-name``` | 短横线分隔的（kebab case）命名方式，建议在```.properties```和```.yml```文件中使用。
+```acme.myProject.person.firstName``` | 标准驼峰命名法（Standard camel case syntax）。
+```acme.my_project.person.first_name``` | 下划线命名法（Underscore notation），它是```.properties```和```.yml```文件中使用的另一种格式（alternative format）。
+```ACME_MYPROJECT_PERSON_FIRSTNAME``` | 大写命名法（upper case format），建议用于系统环境变量。
+
+注解的```prefix```值必须是短横线分隔的命名方式（小写用```-```分隔，如```acme.my-project..person```）。
+
+**表3 每个属性源的宽松的绑定规则**
+
+属性源 | 简单的 | 列表
+---|---|---
+Properties文件 | 驼峰命名法，短横线分隔命名法，或下划线命名法 | 使用```[]```的标准列表语法（syntax）或逗号分隔的值（comma-separated）
+YAML文件 | 驼峰命名法，短横线分隔命名法，或下划线命名法 | 标准的YAML列表语法或逗号分隔的值
+环境变量 | 用下划线作为分隔符的大写命名法。```_```不应在属性名中使用 | 被下划线环绕（surrounded）的数值（numeric values）。例如```MY_ACME_1_OTHER = my.acme[1].other```
+系统变量 | 驼峰命名法，短横线分隔命名法，或下划线命名法 | 使用```[]```的标准列表语法（syntax）或逗号分隔的值（comma-separated）
+
+建议属性存储为小写的短横线分隔的命名方法，如```my.property-name=acme```。
+
+绑定到```Map```属性时，如果```key```包含除了（other than）小写字母，数字字符（alpha-numeric characters），或```-```之外的任何内容，你需要使用括号符号（bracket notation），以便原来的（original）值被保存（is preserved）。如果```key```没有被```[]```环绕（is not surrounded），任何不是字母数字或-的字符都被删除。例如，以下属性绑定到```Map```：
+
+```yaml
+acme:
+  map:
+    "[/key1]": value1
+    "[/key2]": value2
+    /key3: value3
+```
+
+上面的属性将绑定到以```/key1```、```/key2```和```key3```作为map中的key的```Map```。
+
+> For YAML files, the brackets need to be surrounded by quotes for the keys to be parsed properly.
+
+YAML文件，要正确解析键，方括号（brackets）需要用引号（quotes）包围。
+
+### 2.8.7 合并复杂类型
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
