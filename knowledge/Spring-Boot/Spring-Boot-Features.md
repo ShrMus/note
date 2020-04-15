@@ -991,15 +991,95 @@ YAML文件，要正确解析键，方括号（brackets）需要用引号（quote
 
 ### 2.8.7 合并复杂类型
 
+当有多个列表配置在多个地方，通过覆盖来替换整个列表。
 
+例如，假设```MyPojo```对象的```name```和```description```属性默认为```null```。下面展示一个```AcmeProperties```类中包含```MyPojo```列表：
 
+```java
+@ConfigurationProperties("acme")
+public class AcmeProperties {
 
+    private final List<MyPojo> list = new ArrayList<>();
 
+    public List<MyPojo> getList() {
+        return this.list;
+    }
+}
+```
 
+使用下面的配置：
 
+```properties
+acme:
+  list:
+    name: my name
+    description: my description
+---
+spring:
+  profiles: dev
+acme:
+  list:
+    name: my another name
+```
 
+如果```dev```配置文件不是活动的，```AcmeProperties.list```包含了一个```MyPojo```，如前面定义的那样。如果```dev```配置文件被启用，```list```仍然只包含一个元素（```name```值为```my another name```并且```description```值为```null```），该配置不会向list中添加第二个```MyPojo```实例，并且不会合并项（items）。
 
+当```List```被指定在多个配置文件中时，具有最高优先级的那个（并且只使用那个）被使用。如下所示：
 
+```properties
+acme:
+  list:
+    name: my name
+    description: my description
+    name: another name
+    description: another description
+---
+spring:
+  profiles: dev
+acme:
+  list:
+    name: my another name
+```
+
+在前面的例子中，如果```dev```配置文件是活动的，```AcmeProperties.list```包含了一个```MyPojo```（```name```值为```my another name```并且```description```值为```null```）。对于YAML，可以使用逗号分隔的列表和YAML列表来完全覆盖list的内容。
+
+对于```Map```属性，你可以绑定来自多个源的属性值。但是，对于多个源中的相同属性，将使用具有最高优先级的属性。下面展示一个```AcmeProperties```类中包含```Map<String, MyPojo>```：
+
+```java
+@ConfigurationProperties("acme")
+public class AcmeProperties {
+
+    private final Map<String, MyPojo> map = new HashMap<>();
+
+    public Map<String, MyPojo> getMap() {
+        return this.map;
+    }
+}
+```
+
+使用下面的配置：
+
+```properties
+acme:
+  map:
+    key1:
+      name: my name 1
+      description: my description 1
+---
+spring:
+  profiles: dev
+acme:
+  map:
+    key1:
+      name: dev name 1
+    key2:
+      name: dev name 2
+      description: dev description 2
+```
+
+如果```dev```配置文件不是活动的，```AcmeProperties.map```包含一个```key1```（```name```值为```my name 1```并且```description```值为```my description 1```）。如果```dev```文件被启用，```map```包含两个元素```key1```（```name```值为```dev name 1```并且```description```值为```my description 1```）和```key2```（```name```值为```dev name 2```并且```description```值为```dev description 2```）
+
+前面的合并规则适用于来自所有属性源的属性，而不仅仅是YAML文件。
 
 
 
