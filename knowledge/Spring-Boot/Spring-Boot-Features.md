@@ -1084,36 +1084,111 @@ acme:
 
 Spring Boot绑定到```@ConfigurationProperties```bean时，它尝试将外部应用程序属性强制转换为正确的类型。如果需要自定义类型转换，你可以提供一个```ConversionService```类（使用命名为```conversionService```的类）或自定义属性编辑器（通过```CustomEditorConfigurer```类）或自定义转换器```Converters```（使用注释为```@ConfigurationPropertiesBinding```的类）。
 
+因为这个bean是在应用程序生命周期的早期请求的，因此确保限制```ConversionService```使用的依赖项。通常，任何你需要的依赖项可能在创建时没有完全初始化。你可能希望重命名自定义```ConversionService```，如果不需要配置keys则强制执行，并且只依赖于使用```@ConfigurationPropertiesBinding```的自定义转换器。
 
+#### **转换时间**（Converting durations）
 
+Spring Boot提供专门的工具来表达时间。如果你公开一个```java.time.Duration```属性，在应用程序属性中可使用以下格式：
 
+- 常规```long```表达（使用毫秒（milliseconds）作为默认单元，除非已指定```@DurationUnit```）
+- [```java.time.Duration```](https://docs.oracle.com/javase/8/docs/api//java/time/Duration.html#parse-java.lang.CharSequence-)使用的标准ISO-8601格式
+- 一种更具可读性的格式，值和单位是耦合（coupled）的（例如```10s```表示10秒）
 
+如下所示：
 
+```java
+@ConfigurationProperties("app.system")
+public class AppSystemProperties {
 
+    @DurationUnit(ChronoUnit.SECONDS)
+    private Duration sessionTimeout = Duration.ofSeconds(30);
 
+    private Duration readTimeout = Duration.ofMillis(1000);
 
+    public Duration getSessionTimeout() {
+        return this.sessionTimeout;
+    }
 
+    public void setSessionTimeout(Duration sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+    }
 
+    public Duration getReadTimeout() {
+        return this.readTimeout;
+    }
 
+    public void setReadTimeout(Duration readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+}
+```
 
+指定30秒后会话超时，```30```，```PT30S```，```30s```都可以。读取超时为500ms，可以用```500```，```PT0.5S```，```500ms```。
 
+还可以使用任何支持的单位，如：
 
+- ```ns```表示纳秒（nanosecond）
+- ```us```表示微秒（microsecond）
+- ```ms```表示毫秒（millisecond）
+- ```s```表示秒（second）
+- ```m```表示分（minute）
+- ```h```表示时（hour）
+- ```d```表示天（day）
 
+默认单位是毫秒，可以使用```@DurationUnit```覆盖，如上面的例子所示。
 
+如果你从以前的版本升级到使用```Long```来表示时间，如果切换到```Duration```的单位不是毫秒，请确保使用```@DurationUnit```定义这个单位。这样做提供了一个透明的升级路径，同时提供更丰富的格式。
 
+#### 转换数据大小（Converting Data Sizes）
 
+Spring框架有一个以字节表示大小的```DataSize```值类型。如果你公开一个```DataSize```属性，在应用程序属性中可使用以下格式：
 
+- 常规```long```表达（使用字节作为默认单元，除非已指定```@DataSizeUnit```）
+- [```java.time.Duration```](https://docs.oracle.com/javase/8/docs/api//java/time/Duration.html#parse-java.lang.CharSequence-)使用的标准ISO-8601格式
+- 一种更具可读性的格式，值和单位是耦合（coupled）的（例如```10MB```表示10兆）
 
+如下所示：
 
+```java
+@ConfigurationProperties("app.io")
+public class AppIoProperties {
 
+    @DataSizeUnit(DataUnit.MEGABYTES)
+    private DataSize bufferSize = DataSize.ofMegabytes(2);
 
+    private DataSize sizeThreshold = DataSize.ofBytes(512);
 
+    public DataSize getBufferSize() {
+        return this.bufferSize;
+    }
 
+    public void setBufferSize(DataSize bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 
+    public DataSize getSizeThreshold() {
+        return this.sizeThreshold;
+    }
 
+    public void setSizeThreshold(DataSize sizeThreshold) {
+        this.sizeThreshold = sizeThreshold;
+    }
+}
+```
 
+指定10兆字节的缓冲区大小，```10```，```10MB```都可以。256字节的大小阈值可以指定为```256```，```256B```。
 
+还可以使用任何支持的单位，如：
 
+- ```B```表示字节（byte）
+- ```KB```表示千字节（kilobyte）
+- ```MB```表示兆字节（megabyte）
+- ```GB```表示千兆字节，吉字节（gigabyte）
+- ```TB```表示兆兆字节，太字节（terabyte）
+
+默认单位是字节，可以使用```@DataSizeUnit```覆盖，如上面的例子所示。
+
+如果你从以前的版本升级到使用Long来表示字节，如果切换到```DataSize```的单位不是字节，请确保使用```@DataSizeUnit```定义这个单位。这样做提供了一个透明的升级路径，同时提供更丰富的格式。
 
 
 
