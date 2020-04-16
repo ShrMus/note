@@ -1,8 +1,6 @@
-**==Spring Boot (0) 初探==**
+> 【已完成】本文大部分内容翻译自官方文档[https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/html/using-spring-boot.html](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/html/using-spring-boot.html)
 
 [TOC]
-
-> 摘要
 
 # 1. Spring Boot的诞生
 

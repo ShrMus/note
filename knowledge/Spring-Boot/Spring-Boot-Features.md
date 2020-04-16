@@ -1,7 +1,6 @@
+> 【更新中】本文大部分内容翻译自官方文档[https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/html/spring-boot-features.html](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/html/spring-boot-features.html)
 
 [TOC]
-
-> 摘要
 
 # 1.Spring应用程序
 
@@ -1081,6 +1080,9 @@ acme:
 
 前面的合并规则适用于来自所有属性源的属性，而不仅仅是YAML文件。
 
+### 2.8.8 属性转换
+
+Spring Boot绑定到```@ConfigurationProperties```bean时，它尝试将外部应用程序属性强制转换为正确的类型。如果需要自定义类型转换，你可以提供一个```ConversionService```类（使用命名为```conversionService```的类）或自定义属性编辑器（通过```CustomEditorConfigurer```类）或自定义转换器```Converters```（使用注释为```@ConfigurationPropertiesBinding```的类）。
 
 
 
