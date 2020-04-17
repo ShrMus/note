@@ -346,7 +346,7 @@ public class CustomizingException extends Exception implements ExitCodeGenerator
 <span id="2._外部化配置"></span>
 # 2. 外部化配置
 
-Spring Boot允许您将配置外部化，以便可以在不同的环境中使用相同的应用程序代码。你可以使用properties文件，YAML文件，环境变量和命令行参数外部化配置。属性值可以通过使用```@Value```注解直接注入到bean中。通过Spring的```Environment```抽象访问，或通过```@ConfigurationProperties```[绑定到结构化对象](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-typesafe-configuration-properties)。
+Spring Boot允许您将配置外部化，以便可以在不同的环境中使用相同的应用程序代码。你可以使用properties文件，YAML文件，环境变量和命令行参数外部化配置。属性值可以通过使用```@Value```注解直接注入到bean中。通过Spring的```Environment```抽象访问，或通过```@ConfigurationProperties```[绑定到结构化对象](#2.8_类型安全的配置属性)。
 
 Spring Boot使用一种非常特殊的```PropertySource```顺序，其设计目的是允许合理地覆盖值。属性按以下顺序排序：
 
@@ -361,8 +361,8 @@ Spring Boot使用一种非常特殊的```PropertySource```顺序，其设计目�
 9. Java系统属性（```System.getProperties()```）。
 10. 操作系统环境变量。
 11. 只在```random.*```有属性的```RandomValuePropertySource```。
-12. 打包jar之外的[Profile-specific应用程序属性](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-profile-specific-properties)（```application-{profile}.properties```和YAML）。
-13. 打包jar之内的[Profile-specific应用程序属性](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-profile-specific-properties)（```application-{profile}.properties```和YAML）。
+12. 打包jar之外的[Profile-specific应用程序属性](#2.4_Profile-specific属性)（```application-{profile}.properties```和YAML）。
+13. 打包jar之内的[Profile-specific应用程序属性](#2.4_Profile-specific属性)（```application-{profile}.properties```和YAML）。
 14. 打包jar之外的应用程序属性（```application.properties```和YAML）。
 15. 打包jar之内的应用程序属性（```application.properties```和YAML）。
 16. ```@Configuration```类上的[```@PropertySource```](https://docs.spring.io/spring/docs/5.2.2.RELEASE/javadoc-api/org/springframework/context/annotation/PropertySource.html)注解。请注意，在刷新应用程序上下文之前，不会将此类属性源添加到```Environment```中。在刷新开始之前配置某些属性（例如```logging.*```和```spring.main.*```）已经太晚了。
@@ -436,6 +436,7 @@ my.number.in.range=${random.int[1024,65536]}
 
 如果不希望将命令行属性添加到```Environment```中，可以使用```SpringApplication.setAddCommandLineProperties(false)```来禁用。
 
+<span id="2.3_应用程序属性文件"></span>
 ## 2.3 应用程序属性文件
 
 加载配置文件：```SpringApplication```从以下位置的```application.properties```文件中加载属性并将属性添加到Spring ```Environment```中：
@@ -492,6 +493,7 @@ $ java -jar myproject.jar --spring.config.location=classpath:/default.properties
 
 如果应用程序在容器中运行，然后可以使用JNDI属性（在```java:comp/env```中）或servlet上下文初始化参数来代替环境变量或系统属性。
 
+<span id="2.4_Profile-specific属性"></span>
 ## 2.4 Profile-specific属性
 
 除```application.properties```文件之外，profile-specific属性也能通过使用```application-{profile}.properties```命名约定被定义。```Environment```有一组默认配置文件（默认情况下，```[default]```），如果没有设置活动配置文件，就使用这些默认配置文件。换句话说，如果没有配置文件被明确激活，那么属性从```application-default.properties```被加载。
@@ -672,13 +674,16 @@ spring:
 
 建议不要将profile-specific YAML文件和多个YAML文档混合使用。只使用其中一个。
 
+<span id="2.8_类型安全的配置属性"></span>
+
 ## 2.8 类型安全的配置属性
 
 使用```@Value("${property}")```注解注入配置属性有时会很麻烦（cumbersome），特别（especially）是在处理多个属性或数据本质上是分层的情况下。Spring Boot提供了另一种处理属性的方法，允许强类型bean控制和验证应用程序的配置。
 
-请参见[```@Value```和```类型安全配置属性```之间的区别](https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config-vs-value)。
+请参见[```@Value```和```类型安全的配置属性```之间的区别](#2.8.10_@ConfigurationProperties和@Value)。
 
 <span id="2.8.1_JavaBean属性绑定"></span>
+
 ### 2.8.1 JavaBean属性绑定
 
 可以绑定一个声明标准JavaBean属性的bean，如下面的例子所示：
@@ -927,6 +932,7 @@ public AnotherComponent anotherComponent() {
 
 使用```another```前缀定义的任何JavaBean属性都将以类似前面的（preceding）```AcmeProperties```示例的方式映射到```AnotherComponent``` bean。
 
+<span id="2.8.6_宽松的绑定"></span>
 ### 2.8.6 宽松的绑定
 
 Spring Boot使用一些宽松的（relaxed）规则将```Environment```属性绑定到```@ConfigurationProperties``` beans中，因此，```Environment```属性名和bean属性名不需要完全匹配（exact match）。有用的常见示例包括短横线分隔的（dash-speparated）环境属性（如```context-path```绑定到```contextPath```），以及大写的（capitalized）环境属性（如```PORT```绑定到```port```）。如下所示：
@@ -1086,7 +1092,7 @@ Spring Boot绑定到```@ConfigurationProperties```bean时，它尝试将外部�
 
 因为这个bean是在应用程序生命周期的早期请求的，因此确保限制```ConversionService```使用的依赖项。通常，任何你需要的依赖项可能在创建时没有完全初始化。你可能希望重命名自定义```ConversionService```，如果不需要配置keys则强制执行，并且只依赖于使用```@ConfigurationPropertiesBinding```的自定义转换器。
 
-#### **转换时间**（Converting durations）
+#### 转换时间（Converting durations）
 
 Spring Boot提供专门的工具来表达时间。如果你公开一个```java.time.Duration```属性，在应用程序属性中可使用以下格式：
 
@@ -1190,7 +1196,70 @@ public class AppIoProperties {
 
 如果你从以前的版本升级到使用Long来表示字节，如果切换到```DataSize```的单位不是字节，请确保使用```@DataSizeUnit```定义这个单位。这样做提供了一个透明的升级路径，同时提供更丰富的格式。
 
+### 2.8.9 @ConfigurationProperties校验
 
+当用Spring的```@Validated```注解类时，Spring引导尝试验证```ConfigurationProperties```类。你可以直接在配置类上使用JSR-303 ```javax.validation```约束注解。要做到这一点，请确保兼容的JSR-303实现在==classpath==上，然后向字段中添加约束注解，如下所示：
+
+```java
+@ConfigurationProperties(prefix="acme")
+@Validated
+public class AcmeProperties {
+
+    @NotNull
+    private InetAddress remoteAddress;
+
+    // ... getters and setters
+
+}
+```
+
+你还可以通过使用注解```@Bean```来触发验证，该方法使用```@Validated```创建配置属性。
+
+确保始终对嵌套（nested）属性触发验证，即使没有找到属性，也必须使用```@Valid```注解关联的（associated）字段。下面的例子建立在前面的```AcmeProperties```例子上：
+
+```java
+@ConfigurationProperties(prefix="acme")
+@Validated
+public class AcmeProperties {
+
+    @NotNull
+    private InetAddress remoteAddress;
+
+    @Valid
+    private final Security security = new Security();
+
+    // ... getters and setters
+
+    public static class Security {
+
+        @NotEmpty
+        public String username;
+
+        // ... getters and setters
+
+    }
+}
+```
+
+你还可以通过创建一个名为```configurationPropertiesValidator```的bean definition来添加自定义Spring ```Validator```。```@Bean```方法应该声明为静态的。配置属性验证器（validator）是在应用程序生命周期的早期创建的，将```@Bean```方法声明为静态方法可以在创建bean的时候不用实例化（instantiate）```@Configuration```类。这样做可以避免任何可能由早期实例化引起的问题。
+
+模块```spring-boot-actuator```包含一个公开所有```@ConfigurationProperties```bean的终端。将web浏览器指向```/actuator/configprops```或使用等效的JMX终端。点击[生产预备特性](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/html/production-ready-features.html#production-ready-endpoints)查看详情。
+
+<span id="2.8.10_@ConfigurationProperties和@Value"></span>
+### 2.8.10 @ConfigurationProperties和@Value
+
+注解```@Value```是核心容器的功能，它不提供与类型安全配置属性相同的特性。下表总结了```@ConfigurationProperties```和```@Value```支持的特性：
+
+
+特性 | ```@Configuration``` | ```@Value```
+---|---|---
+[宽松的绑定（Relaxed binding）](#2.8.6_宽松的绑定) | Yes | No
+[元数据支持（Meta-data support）](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/html/appendix-configuration-metadata.html#configuration-metadata) | Yes | No
+```SpEL```表达式 | No | Yes
+
+如果你为自己的组件定义了一组（a set of）配置keys，建议将它们分组到带有```@ConfigurationProperties```注解的POJO中。你还应该注意（aware），由于```@Value```不支持宽松的绑定，因此如果你需要使用环境变量来提供值，那么它就不是一个好的选择。
+
+最后，虽然您可以在```@Value```中编写```SpEL```表达式，但是这样的表达式不会从[应用程序属性文件中](#2.3_应用程序属性文件)处理。
 
 
 
