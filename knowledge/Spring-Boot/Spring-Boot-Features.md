@@ -1261,6 +1261,57 @@ public class AcmeProperties {
 
 最后，虽然您可以在```@Value```中编写```SpEL```表达式，但是这样的表达式不会从[应用程序属性文件中](#2.3_应用程序属性文件)处理。
 
+# 3. 配置文件
+
+Spring配置文件提供了一种方法来隔离（segregate）应用程序配置的各个部分，并使其仅在某些环境中可用。任何```@Component```、```@Configuration```或```@ConfigurationProperties```都可以标记为@Profile来限制它的加载时间，如下所示：
+
+```java
+@Configuration(proxyBeanMethods = false)
+@Profile("production")
+public class ProductionConfiguration {
+
+    // ...
+
+}
+```
+
+如果```ConfigurationProperties```类是通过```EnableConfigurationProperties```注册的而不是通过自动扫描注册的，```@Profile```注解需要在具有```@EnableConfigurationProperties```注解的```@Configuration```类上指定。在扫描```@ConfigurationProperties```的情况下，可以在```@ConfigurationProperties```类本身上指定```@Profile```。
+
+你可以使用```spring.profiles.active``` ```Environment```属性指定哪些配置文件是活动的。你可以使用前面描述的任何方式指定属性。例如，你可以在```application.properties```中包含它，如下所示：
+
+```properties
+spring.profiles.active=dev,hsqldb
+```
+
+你还可以在命令行使用参数：```--spring.profiles.active=dev,hsqldb```
+
+## 3.1 添加活动的配置文件
+
+属性```spring.profiles.active```遵循与其他属性相同的顺序规则：优先使用优先级最高的```PropertySource```。这意味着你可以在```application.properties```中指定活动配置文件，然后使用命令行开关替换它们。
+
+有时，将profil-specific文件的属性添加到active profiles比替换更有用。```spring.profiles.include```属性可用于无条件地添加active profiles。```SpringApplication```入口点还有一个用于设置其他配置文件的Java API（也就是说，在```spring.profiles.active```属性激活的对象之上）。参见[SpringApplication](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/api//org/springframework/boot/SpringApplication.html)中的```setAdditionalProfiles()```方法。
+
+例如，当使用开关运行具有以下属性的应用程序时，```--spring.profiles.active=prod```，```proddb```和```prodmq```配置文件也被激活：
+
+```properties
+---
+my.property: fromyamlfile
+---
+spring.profiles: prod
+spring.profiles.include:
+  - proddb
+  - prodmq
+```
+
+请记住，可以在YAML文档中定义```spring.profiles```属性，以确定配置中何时包含此特定文档。有关详细信息，请阅读[howto.html](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/html/howto.html#howto-change-configuration-depending-on-the-environment)。
+
+## 3.2 以编程方式设置配置文件
+
+在应用程序运行之前，可以通过调用```SpringApplication.setAdditionalProfiles(…)```以编程方式设置active profiles。也可以通过使用Spring的```ConfigurableEnvironment```接口来激活配置文件。
+
+## 3.3 Profile-specific配置文件
+
+Profile-specific的两个不同的设置，```application.properties```（或```application.yml```）和通过```@ConfigurationProperties```引用的文件都被视为文件并加载。有关详细信息，请阅读[Profile-specific属性](#2.4_Profile-specific属性)。
 
 
 
